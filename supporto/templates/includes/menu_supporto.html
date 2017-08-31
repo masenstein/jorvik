@@ -1,0 +1,57 @@
+{% block menu_laterale %}
+    <div class="col-md-3">
+
+        <div class="well well-sm">
+            <ul id="sezione" class="nav nav-pills nav-stacked navbar-collapse collapse">
+
+                {% for sezione_nome, sezione_pagine in menu.supporto %}
+
+                    <li class="dropdown-header grassetto piu-grande">{{ sezione_nome }}</li>
+
+                    {% for link_nome, link_icona, link_url, link_contatore in sezione_pagine %}
+
+                        <li role="presentation" {% if link_url in request.path %}class="active"{% endif %}>
+                            <a href="{{ link_url|urlencode }}">
+                                <i class="fa {{ link_icona }} fa-fw"></i>
+                                {{ link_nome }}
+                            </a>
+                        </li>
+
+                    {% endfor %}
+
+                    <hr/>
+
+                {% endfor %}
+
+            </ul>
+        </div>
+        {% if sezioni %}
+            <div class="well well-sm">
+
+                <ul id="sezione-2" class="nav nav-pills nav-stacked navbar-collapse collapse">
+
+
+                    <li class="dropdown-header grassetto piu-grande">Ticket</li>
+
+                    {% for sez_nome, sez_numero, sez_link in sezioni %}
+
+                        <li role="presentation" {% if sez_link in request.path %}class="active"{% endif %}>
+                            <a href="/ticket/{{ sez_link|urlencode }}/">
+                                {{ sez_nome }}
+                                <span class="badge pull-right">
+                            {{ sez_numero }}
+                        </span>
+                            </a>
+                        </li>
+
+                    {% endfor %}
+
+
+                </ul>
+
+            </div>
+        {% endif %}
+    </div>
+
+
+{% endblock %}

@@ -503,6 +503,7 @@ class Persona(ModelloSemplice, ConMarcaTemporale, ConAllegati, ConVecchioID):
 
     @property
     def applicazioni_disponibili(self):
+        from supporto.services import KayakoRESTService
         lista = []
 
         if self.volontario:
@@ -544,6 +545,7 @@ class Persona(ModelloSemplice, ConMarcaTemporale, ConAllegati, ConVecchioID):
             #lista += [(APPLICAZIONI_SLUG_DICT[d.tipo], PERMESSI_NOMI_DICT[d.tipo])]
         lista += [('/articoli/', 'Articoli', 'fa-newspaper-o')]
         lista += [('/documenti/', 'Documenti', 'fa-folder')]
+        lista += [('/ticket/', 'Supporto', 'fa-support', KayakoRESTService().get_ticketBadgeCount(self.email))]
         return lista
 
 

@@ -1,0 +1,123 @@
+{% extends "anagrafica_utente_vuota.html" %}
+
+{% load bootstrap3 %}
+{% load base_tags %}
+
+{% block pagina_titolo %}Dettaglio ticket{% endblock %}
+
+{% block menu_laterale %}
+    {% include "includes/menu_supporto.html" %}
+{% endblock %}
+
+{% block app_contenuto %}
+
+    <div class="container">
+
+        <div class="col-md-9">
+
+            <div class="panel panel-info">
+
+                <div class="panel-heading">
+                    <i class="fa fa-fw fa-user"></i> Dettaglio ticket
+                </div>
+
+                <div class="panel-body">
+
+                    <table class="table table-responsive table-striped">
+                        <tr>
+                            <td>ID Ticket</td>
+                            <td class="grassetto">{{ ticket.displayid }}</td>
+                        </tr>
+                        <tr>
+                            <td>Ultimo aggiornamento</td>
+                            <td class="grassetto">{{ ticket.lastactivity }}</td>
+                        </tr>
+                        <tr>
+                            <td>Ultimo che ha risposto</td>
+                            <td class="grassetto">{{ ticket.lastreplier }}</td>
+                        </tr>
+                        <tr>
+                            <td>Dipartimento</td>
+                            <td class="grassetto">{{ tipologiche.DEPARTMENT_TICKET|hash:ticket.departmentid  }}</td>
+                        </tr>
+                        <tr>
+                            <td>Tipo</td>
+                            <td class="grassetto">{{ tipologiche.TYPE_TICKET|hash:ticket.typeid }}</td>
+                        </tr>
+                        <tr>
+                            <td>Stato</td>
+                            <td class="grassetto">{{ tipologiche.STATUS_TICKET|hash:ticket.statusid }}</td>
+                        </tr>
+                        <tr>
+                            <td>Priorità</td>
+                            <td class="grassetto">{{ tipologiche.PRIORITY_TICKET|hash:ticket.priorityid }}</td>
+                        </tr>
+                        {% if ticket.statusid != TICKET_CHIUSO %}
+                        <tr>
+                            <td colspan="2">
+                                <a href="/ticket/chiudi_ticket/{{ ticket.displayid }}/"  class="btn btn-primary" style="float:right"
+                                   data-conferma="Vuoi davvero chiudere il ticket {{ ticket.displayid }}?">
+                                    <i class="fa fa-check"></i>
+                                    Chiudi ticket
+                                </a>
+                            </td>
+                        </tr>
+                        {% endif %}
+                    </table>
+
+                </div>
+
+            </div>
+            {% if ticket.statusid != TICKET_CHIUSO %}
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                        <i class="fa fa-fw fa-send"></i>
+                        Aggiungi messaggio al ticket
+                    </h2>
+                </div>
+                <div class="panel-body">
+
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% bootstrap_form modulo %}
+                        <button type="submit" class="btn btn-primary" style="float:right">
+                            <i class="fa fa-fw fa-check"></i>
+                            Invia
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="row allinea-centro">
+                    <h3>Cronologia conversazione</h3>
+                </div>
+                {% for post in postList %}
+                    {% include "includes/elemento_lista_post.html" %}
+                {% endfor %}
+
+            </div>
+
+            {% if hasattachments %}
+            <div class="row">
+                <div class="row allinea-centro">
+                    <h3>Allegati</h3>
+                </div>
+                <hr>
+                {% for attachment in attachmentList %}
+                    <div class="allinea-sinistra" style="padding-top: 2%">
+                        <div class="col-md-6">
+                            <a href="/ticket/download_post_attachment/{{ ticket.displayid}}/{{ attachment.id}}" > {{ attachment.filename }}</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+{% endblock %}
+

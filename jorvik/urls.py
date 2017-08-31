@@ -28,7 +28,7 @@ from autenticazione.funzioni import pagina_privata, pagina_privata_no_cambio_fir
 from jorvik.settings import MEDIA_ROOT
 
 from autenticazione.two_factor.urls import urlpatterns as tf_urls
-
+import supporto.viste
 
 handler404 = base.errori.non_trovato
 
@@ -329,4 +329,17 @@ urlpatterns = [
     url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
     # OAuth 2.0
     # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
+    # Integrazione Kayako
+    url(r'^ticket/$', supporto.viste.supporto_nuova_richiesta_step1),
+    url(r'^ticket/nuova_richiesta_step1/$', supporto.viste.supporto_nuova_richiesta_step1),
+    url(r'^ticket/nuova_richiesta_step2/$', supporto.viste.supporto_nuova_richiesta_step2),
+    url(r'^ticket/ricerca_kb/$', supporto.viste.supporto_ricerca_kb),
+    url(r'^ticket/attesa_risposta/$', supporto.viste.supporto_attesa_risposta),
+    url(r'^ticket/in_lavorazione/$', supporto.viste.supporto_in_lavorazione),
+    url(r'^ticket/chiusi/$', supporto.viste.supporto_chiusi),
+    url(r'^ticket/dettaglio/(?P<ticketdisplayID>.*)/$', supporto.viste.supporto_dettaglio_ticket),
+    url(r'^ticket/chiudi_ticket/(?P<ticketdisplayID>.*)/$', supporto.viste.supporto_chiudi_ticket),
+    url(r'^ticket/download_post_attachment/(?P<ticketdisplayID>.*)/(?P<attachmentID>[0-9]+)/$', supporto.viste.supporto_download_post_attachment),
+    url(r'^ticket/download_kb_attachment/(?P<articleID>.*)/(?P<attachmentID>[0-9]+)/$', supporto.viste.supporto_download_kb_attachment),
+    url(r'^ticket/dettaglio_kb/(?P<articleID>.*)/$', supporto.viste.supporto_dettaglio_kb),
 ]

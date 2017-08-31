@@ -31,3 +31,7 @@ def level_to_bootstrap(message):
         constants.ERROR: 'alert-danger',
     }
     return map.get(message.level, 'alert-info')
+
+@register.filter
+def hash(h,key):
+    return h[key]

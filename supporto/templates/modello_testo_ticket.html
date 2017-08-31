@@ -1,0 +1,22 @@
+    <p>{{ testo }}</p>
+
+    <p style="font-family: monospace; font-size: smaller;">
+        <strong>Informazioni tecniche associate:</strong><br />
+        ID={{ mittente.pk }}<br />
+        Nome={{ mittente.nome_completo }}<br />
+        Admin={<a target="_blank" href="https://gaia.cri.it/admin/anagrafica/persona/{{ mittente.pk }}/">Persona</a>, <a target="_blank" href="https://gaia.cri.it/admin/autenticazione/utenza/{{ mittente.utenza.pk }}/">Utenza</a>}
+        Deleghe ({{ mittente.deleghe_attuali.count }}) =
+        {% for d in mittente.deleghe_attuali %}
+            - <a target="_blank" href="https://gaia.cri.it/admin/anagrafica/delega/{{ d.pk }}/">{{ d.get_tipo_display }}</a> per <a target="_blank" href="https://gaia.cri.it{{ d.oggetto.url_admin }}">{{ d.oggetto }}</a>{% endfor %}
+        </p>
+        {% if persona %}
+            <p style="font-family: monospace; font-size: smaller;">
+                <strong>Il supporto è richiesto per:</strong><br />
+                ID={{ persona.pk }}<br />
+                Nome={{ persona.nome_completo }}<br />
+                Admin={<a target="_blank" href="https://gaia.cri.it/admin/anagrafica/persona/{{ persona.pk }}/">Persona</a>, <a target="_blank" href="https://gaia.cri.it/admin/autenticazione/utenza/{{ persona.utenza.pk }}/">Utenza</a>}
+                Deleghe ({{ persona.deleghe_attuali.count }}) =
+                {% for d in persona.deleghe_attuali %}
+                    - <a target="_blank" href="https://gaia.cri.it/admin/anagrafica/delega/{{ d.pk }}/">{{ d.get_tipo_display }}</a> per <a target="_blank" href="https://gaia.cri.it{{ d.oggetto.url_admin }}">{{ d.oggetto }}</a>{% endfor %}
+            </p>
+        {% endif %}

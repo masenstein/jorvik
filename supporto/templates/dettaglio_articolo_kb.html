@@ -1,0 +1,46 @@
+{% extends "anagrafica_utente_vuota.html" %}
+
+{% load bootstrap3 %}
+
+{% block pagina_titolo %}Cerca nella KB{% endblock %}
+
+{% block menu_laterale %}
+    {% include "includes/menu_supporto.html" %}
+{% endblock %}
+
+{% block app_contenuto %}
+
+    <div class="container">
+
+        <div class="col-md-9">
+
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <i class="fa fa-fw fa-newspaper-o"></i>
+                        {{articolo.subject}}
+                    </h4>
+                </div>
+                <div class="panel-body">
+                    <p>{{articolo.contents|safe}}</p>
+
+                    <p>
+                        <strong>Allegati:</strong>
+                    </p>
+                    <div class="row">
+                        {% for attachment in articolo.attachmentList %}
+                            <div class="allinea-sinistra"  style="padding-top: 2%">
+                                <div class="col-md-6">
+                                    <a href="/ticket/download_kb_attachment/{{ articolo.kbarticleid}}/{{ attachment.id}}" > {{ attachment.filename }}</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}
+

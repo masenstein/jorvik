@@ -1,0 +1,35 @@
+{% load bootstrap3 %}
+{% load base_tags %}
+
+<table class="table table-striped table-bordered">
+    <thead>
+    <th>ID Ticket</th>
+    <th>Ultimo aggiornamento</th>
+    <th>Dipartimento</th>
+    <th>Tipo</th>
+    <th>Stato</th>
+    <th>Priorit&agrave;</th>
+    </thead>
+
+    {% for ticket in lista_ticket %}
+
+        <tr>
+
+            <td><a href="/ticket/dettaglio/{{ ticket.displayid }}">{{ ticket.displayid }}</a></td>
+            <td>{{ ticket.lastactivity }}</td>
+            <td>{{ tipologiche.DEPARTMENT_TICKET|hash:ticket.departmentid  }}</td>
+            <td>{{ tipologiche.TYPE_TICKET|hash:ticket.typeid }}</td>
+            <td>{{ tipologiche.STATUS_TICKET|hash:ticket.statusid }}</td>
+            <td>{{ tipologiche.PRIORITY_TICKET|hash:ticket.priorityid }}</td>
+        </tr>
+
+    {% empty %}
+        <tr class="info">
+            <td colspan="6">
+                <h4><i class="fa fa-fw fa-info-circle"></i> Al momento non ci sono ticket di questa tipologia.</h4>
+            </td>
+        </tr>
+
+    {% endfor %}
+
+</table>

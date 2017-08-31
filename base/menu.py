@@ -234,6 +234,12 @@ def menu(request):
                 ("Elenco Corsi Base", "fa-list", "/formazione/corsi-base/elenco/"),
             )),
         ),
+        "supporto": (
+            ("Supporto", (
+                ("Nuovo Ticket", "fa-pencil", "/ticket/nuova_richiesta_step1"),
+                ("Cerca nella KB", "fa-search", "/ticket/ricerca_kb"),
+            )),
+        ),
     }
     if me and hasattr(me, 'aspirante'):
         elementi['elementi_anagrafica'] = elementi['aspirante']

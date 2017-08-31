@@ -1,0 +1,34 @@
+{% extends "anagrafica_utente_vuota.html" %}
+
+{% load bootstrap3 %}
+
+{% block pagina_titolo %}Cerca nella KB{% endblock %}
+
+{% block menu_laterale %}
+    {% include "includes/menu_supporto.html" %}
+{% endblock %}
+
+{% block app_contenuto %}
+
+    <div class="container">
+
+        <div class="col-md-9">
+
+            {% if moduloRicercaInKnowledgeBase %}
+                {% include 'includes/cerca_nella_kb.html' %}
+            {% endif %}
+
+            {% for articolo in articleList %}
+                {% include "includes/elemento_lista_kb.html" %}
+            {% empty %}
+                <div class="alert alert-warning alert-block">
+                    <h4><i class="fa fa-info-circle"></i> Nessun articolo</h4>
+                    <p>Non &egrave; stato trovato alcun articolo.</p>
+                </div>
+            {% endfor %}
+
+        </div>
+    </div>
+
+{% endblock %}
+

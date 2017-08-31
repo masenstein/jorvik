@@ -1,0 +1,75 @@
+{% extends "anagrafica_utente_vuota.html" %}
+
+{% load bootstrap3 %}
+
+{% block pagina_titolo %}Nuova richiesta{% endblock %}
+
+{% block menu_laterale %}
+    {% include "includes/menu_supporto.html" %}
+{% endblock %}
+
+{% block app_contenuto %}
+
+    <div class="container">
+
+        <div class="col-md-9">
+
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h2 class="panel-title">
+                        <i class="fa fa-fw fa-info-circle"></i>
+                        Il servizio di supporto
+                    </h2>
+                </div>
+
+                <div class="panel-body">
+
+                    <p>
+                        <strong>Niente paura</strong> &mdash;
+                        La nostra instancabile squadra di assistenza &egrave; sempre al lavoro per
+                        assistere i Volontari di Croce Rossa Italiana e gli aspiranti volontari nell'utilizzo di Gaia.
+                    </p>
+
+                    <p>
+                        Da questa pagina potrai inoltrare una richiesta di supporto
+                        compilando un semplice modulo.
+                    </p>
+
+                    <p class="text-warning">
+                        <i class="fa fa-fw fa-warning"></i> <strong>Nota bene</strong> &mdash;
+                        Selezionare il dipartimento corretto di richiesta ci permetter&agrave; di gestire la richiesta
+                        molto pi&ugrave; rapidamente.
+                    </p>
+
+                </div>
+            </div>
+            {% if moduloRicercaInKnowledgeBase %}
+                {% include 'includes/cerca_nella_kb.html' %}
+            {% endif %}
+            {% if modulo %}
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h2 class="panel-title">
+                            <i class="fa fa-fw fa-send"></i>
+                            Nuova richiesta - (1/2)
+                        </h2>
+                    </div>
+                    <div class="panel-body">
+                        <p>
+                            Se non trovi una soluzione al tuo problema nel nostro knowledge base, puoi inviare un ticket selezionando un dipartimento appropriato qui sotto.
+                        </p>
+                        <form method="POST">
+                            {% csrf_token %}
+                            {% bootstrap_form modulo %}
+                            <button type="submit" class="btn btn-primary" style="float:right">
+                                <i class="fa fa-fw fa-check"></i>
+                                Procedi
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+{% endblock %}
