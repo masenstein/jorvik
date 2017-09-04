@@ -28,6 +28,7 @@ def supporto_nuova_richiesta_step1(request, me=None):
         articleList = KayakoRESTService().get_knowledgebase_results(keyword)
 
         contesto = {
+            "sezioni": KayakoRESTService().listeTicket(me.email),
             "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
             "articleList": articleList
         }
