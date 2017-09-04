@@ -18,11 +18,14 @@ class KayakoRESTService():
     params = None
 
     def __init__(self):
-        self.salt = str(random.getrandbits(32))
-        signature = hmac.new(bytes(KAYAKO_SECRET_KEY, 'utf-8'), msg=self.salt.encode(),
-                             digestmod=hashlib.sha256).digest()
-        self.encodedSignature = base64.encodebytes(signature)
-        self.params = {'salt': self.salt, 'apikey': KAYAKO_API_KEY, 'signature': self.encodedSignature}
+        try:
+            self.salt = str(random.getrandbits(32))
+            signature = hmac.new(bytes(KAYAKO_SECRET_KEY, 'utf-8'), msg=self.salt.encode(),
+                                 digestmod=hashlib.sha256).digest()
+            self.encodedSignature = base64.encodebytes(signature)
+            self.params = {'salt': self.salt, 'apikey': KAYAKO_API_KEY, 'signature': self.encodedSignature}
+        except Exception as e:
+            pass
 
     def get_departments(self):
         """

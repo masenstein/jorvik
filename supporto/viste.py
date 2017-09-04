@@ -1,6 +1,6 @@
 from anagrafica.permessi.applicazioni import PRESIDENTE, UFFICIO_SOCI, UFFICIO_SOCI_TEMPORANEO, UFFICIO_SOCI_UNITA
 from autenticazione.funzioni import pagina_privata
-from base.errori import messaggio_generico
+from base.errori import messaggio_generico, errore_generico
 from supporto.costanti import *
 from django.shortcuts import redirect
 from supporto.utils import download_attachment, supporto_get_lista_ticket
@@ -20,38 +20,44 @@ def supporto_nuova_richiesta_step1(request, me=None):
     from supporto.forms import ModuloSceltaDipartimentoTicket
     modulo = None
 
-    moduloRicercaInKnowledgeBase = ModuloRicercaInKnowledgeBase(request.POST or None)
+    try:
+        moduloRicercaInKnowledgeBase = ModuloRicercaInKnowledgeBase(request.POST or None)
 
-    if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
+        if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
 
-        keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
-        articleList = KayakoRESTService().get_knowledgebase_results(keyword)
+            keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
+            articleList = KayakoRESTService().get_knowledgebase_results(keyword)
+
+            contesto = {
+                "sezioni": KayakoRESTService().listeTicket(me.email),
+                "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
+                "articleList": articleList
+            }
+            return 'lista_articoli_kb.html', contesto
+
+
+        if me:
+
+            deptList = KayakoRESTService().get_departments()
+            modulo = ModuloSceltaDipartimentoTicket(request.POST or None)
+            modulo.fields['dipartimento'].choices = deptList
+
+        if modulo and modulo.is_valid():
+
+            request.session['dipartimento'] = modulo.cleaned_data['dipartimento']
+            return redirect('/ticket/nuova_richiesta_step2/')
 
         contesto = {
-            "sezioni": KayakoRESTService().listeTicket(me.email),
-            "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
-            "articleList": articleList
+            "modulo": modulo,
+            'moduloRicercaInKnowledgeBase': moduloRicercaInKnowledgeBase,
+            'sezioni': KayakoRESTService().listeTicket(me.email)
         }
-        return 'lista_articoli_kb.html', contesto
+        return 'nuova_richiesta_step1.html', contesto
+    except Exception as e:
+       return errore_generico(request,
+                        titolo="Errore", messaggio="Pagina di supporto al momento non disponibile.",
+                        torna_titolo="Home page", torna_url="/", embed=False)
 
-
-    if me:
-
-        deptList = KayakoRESTService().get_departments()
-        modulo = ModuloSceltaDipartimentoTicket(request.POST or None)
-        modulo.fields['dipartimento'].choices = deptList
-
-    if modulo and modulo.is_valid():
-
-        request.session['dipartimento'] = modulo.cleaned_data['dipartimento']
-        return redirect('/ticket/nuova_richiesta_step2/')
-
-    contesto = {
-        "modulo": modulo,
-        'moduloRicercaInKnowledgeBase': moduloRicercaInKnowledgeBase,
-        'sezioni': KayakoRESTService().listeTicket(me.email)
-    }
-    return 'nuova_richiesta_step1.html', contesto
 
 @pagina_privata
 def supporto_nuova_richiesta_step2(request, me=None):
