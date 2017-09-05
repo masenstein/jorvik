@@ -29,6 +29,10 @@
                             <td class="grassetto">{{ ticket.displayid }}</td>
                         </tr>
                         <tr>
+                            <td>Oggetto</td>
+                            <td class="grassetto">{{ ticket.subject | slice:"0:50" }}</td>
+                        </tr>
+                        <tr>
                             <td>Ultimo aggiornamento</td>
                             <td class="grassetto">{{ ticket.lastactivity }}</td>
                         </tr>
@@ -37,20 +41,8 @@
                             <td class="grassetto">{{ ticket.lastreplier }}</td>
                         </tr>
                         <tr>
-                            <td>Dipartimento</td>
-                            <td class="grassetto">{{ tipologiche.DEPARTMENT_TICKET|hash:ticket.departmentid  }}</td>
-                        </tr>
-                        <tr>
-                            <td>Tipo</td>
-                            <td class="grassetto">{{ tipologiche.TYPE_TICKET|hash:ticket.typeid }}</td>
-                        </tr>
-                        <tr>
                             <td>Stato</td>
-                            <td class="grassetto">{{ tipologiche.STATUS_TICKET|hash:ticket.statusid }}</td>
-                        </tr>
-                        <tr>
-                            <td>Priorità</td>
-                            <td class="grassetto">{{ tipologiche.PRIORITY_TICKET|hash:ticket.priorityid }}</td>
+                            <td class="grassetto">{{STATUS_TICKET|hash:ticket.statusid }}</td>
                         </tr>
                         {% if ticket.statusid != TICKET_CHIUSO %}
                         <tr>

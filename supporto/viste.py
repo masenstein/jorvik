@@ -214,8 +214,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
     :return:
     """
     from base.errori import permessi
-    from supporto.models import Tipologiche
-    from supporto.costanti import TICKET_CHIUSO
+    from supporto.costanti import TICKET_CHIUSO, STATUS_TICKET
     from supporto.forms import ModuloPostTicket
 
     ticket = KayakoRESTService().get_ticketByDisplayID(ticketdisplayID)
@@ -254,7 +253,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
 
     contesto = {
         'ticket': ticket,
-        'tipologiche': Tipologiche(),
+        'STATUS_TICKET': STATUS_TICKET,
         'TICKET_CHIUSO' : str(TICKET_CHIUSO),
         'modulo' : modulo,
         'sezioni': KayakoRESTService().listeTicket(me.email),

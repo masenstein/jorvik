@@ -5,3 +5,6 @@ TICKET_ATTESA_RISPOSTA=4
 DEFAULT_TICKET_PRIORITY_ID=1
 DEFAULT_TICKET_TYPE_ID=1
 DEFAULT_AUTO_USER_ID=1
+
+#MAPPA STATUS_TICKET: codice stato - decrizione stato
+STATUS_TICKET = {"1":"Aperto", "2":"In lavorazione", "3":"Chiuso", "4":"In attesa di risposta"}

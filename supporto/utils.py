@@ -27,13 +27,13 @@ def supporto_get_lista_ticket(statusIdList, titoloPagina, me=None):
     :param titoloPagina: il title html della pagina che sarà mostrata
     :return: il template html ed il contesto per la sua valorizzazione
     """
-    from supporto.models import Tipologiche
+    from supporto.costanti import STATUS_TICKET
     from supporto.services import KayakoRESTService
 
     ticketList = KayakoRESTService().get_ticketListByStatus(KayakoRESTService().get_departments_ids(),statusIdList, KayakoRESTService().get_userIdByEmail(me.email))
 
     contesto = {
-        'tipologiche': Tipologiche(),
+        'STATUS_TICKET': STATUS_TICKET,
         'sezioni': KayakoRESTService().listeTicket(me.email),
         'lista_ticket': ticketList,
         'titolo_pagina': titoloPagina

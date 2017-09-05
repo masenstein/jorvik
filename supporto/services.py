@@ -272,9 +272,7 @@ class KayakoRESTService():
                 ticketItem.statusid = statusId
                 ticketItem.lastactivity = datetime.datetime.fromtimestamp(
                     int(ticket.find('./lastactivity').text)).strftime("%d/%m/%Y %H:%M")
-                ticketItem.departmentid = ticket.find('./departmentid').text
-                ticketItem.typeid = ticket.find('./typeid').text
-                ticketItem.priorityid = ticket.find('./priorityid').text
+                ticketItem.subject = ticket.find('./subject').text
                 ticketList.append(ticketItem)
 
         return ticketList
@@ -360,9 +358,7 @@ class KayakoRESTService():
             ticketItem.statusid = statusId
             ticketItem.lastactivity = datetime.datetime.fromtimestamp(
                 int(ticket.find('./lastactivity').text)).strftime("%d/%m/%Y %H:%M")
-            ticketItem.departmentid = ticket.find('./departmentid').text
-            ticketItem.typeid = ticket.find('./typeid').text
-            ticketItem.priorityid = ticket.find('./priorityid').text
+            ticketItem.subject = ticket.find('./subject').text
             ticketItem.lastreplier = ticket.find('./lastreplier').text
             ticketItem.email = ticket.find('./email').text
 

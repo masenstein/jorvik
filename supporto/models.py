@@ -35,12 +35,13 @@ class Ticket(object):
     priorityid = None
     lastreplier = None
     email = None
+    subject = None
     ticketPostItemList = []
     attachmentList = []
 
     def __repr__(self):
         return (
-            'id={}, displayid={}, lastactivity={}, departmentid={}, statusid={}, typeid={}, priorityid={}, lastreplier={}, email={}, ticketPostItemList={}'.format(
+            'id={}, displayid={}, lastactivity={}, departmentid={}, statusid={}, typeid={}, priorityid={}, lastreplier={}, email={}, subject={}, ticketPostItemList={}'.format(
                 self.id,
                 self.displayid,
                 self.lastactivity,
@@ -50,14 +51,5 @@ class Ticket(object):
                 self.priorityid,
                 self.lastreplier,
                 self.email,
+                self.subject,
                 self.ticketPostItemList))
-
-
-class Tipologiche():
-
-    from supporto.services import KayakoRESTService
-    # recuperiamo i dati delle entità tipologiche (che non variano nel tempo)
-    STATUS_TICKET = dict(KayakoRESTService().get_ticketStatus())
-    PRIORITY_TICKET = dict(KayakoRESTService().get_ticketPriority())
-    TYPE_TICKET = dict(KayakoRESTService().get_ticketType())
-    DEPARTMENT_TICKET = dict(KayakoRESTService().get_departments())
