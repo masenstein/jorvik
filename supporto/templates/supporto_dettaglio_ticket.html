@@ -61,11 +61,18 @@
 
             </div>
             {% if ticket.statusid != TICKET_CHIUSO %}
+            <h3>
+                <i class="fa fa-fw fa-comments-o"></i>
+                Commenti
+                <span class="text-muted">
+                    {{ postList|length}}
+                </span>
+            </h3>
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h2 class="panel-title">
-                        <i class="fa fa-fw fa-send"></i>
-                        Aggiungi messaggio al ticket
+                        <i class="fa fa-fw fa-edit"></i>
+                        Scrivi un commento
                     </h2>
                 </div>
                 <div class="panel-body">
@@ -74,8 +81,8 @@
                         {% csrf_token %}
                         {% bootstrap_form modulo %}
                         <button type="submit" class="btn btn-primary" style="float:right">
-                            <i class="fa fa-fw fa-check"></i>
-                            Invia
+                            <i class="fa fa-fw fa-send"></i>
+                            Scrivi
                         </button>
                     </form>
                 </div>
@@ -83,9 +90,7 @@
             {% endif %}
 
             <div class="row">
-                <div class="row allinea-centro">
-                    <h3>Cronologia conversazione</h3>
-                </div>
+
                 {% for post in postList %}
                     {% include "includes/elemento_lista_post.html" %}
                 {% endfor %}
@@ -94,13 +99,16 @@
 
             {% if hasattachments %}
             <div class="row">
-                <div class="row allinea-centro">
-                    <h3>Allegati</h3>
-                </div>
-                <hr>
+                <h3>
+                    <i class="fa fa-fw fa-file"></i>
+                    Allegati
+                    <span class="text-muted">
+                        {{ attachmentList|length}}
+                    </span>
+                </h3>
                 {% for attachment in attachmentList %}
                     <div class="allinea-sinistra" style="padding-top: 2%">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <a href="/ticket/download_post_attachment/{{ ticket.displayid}}/{{ attachment.id}}" > {{ attachment.filename }}</a>
                         </div>
                     </div>

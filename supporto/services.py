@@ -370,12 +370,13 @@ class KayakoRESTService():
                 ticketPostItem = TicketPost()
                 ticketPostItem.id = post.find('./id').text
                 ticketPostItem.dateline =  datetime.datetime.fromtimestamp(
-                    int(post.find('./dateline').text)).strftime("%d/%m/%Y %H:%M")
+                    int(post.find('./dateline').text)).strftime("%d/%m/%Y %H:%M:%S")
                 ticketPostItem.fullname = post.find('./fullname').text
                 ticketPostItem.hasattachments = post.find('./hasattachments').text
                 ticketPostItem.contents = post.find('./contents').text
                 ticketPostItemList.append(ticketPostItem)
 
+            ticketPostItemList.sort(key=lambda x: x.dateline, reverse=True)
             ticketItem.ticketPostItemList = ticketPostItemList
             ticketItem.attachmentList = self.getTicketAttachments(ticketItem.id)
 

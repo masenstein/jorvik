@@ -21,7 +21,7 @@ class ModuloRichiestaTicket(forms.Form):
 
 class ModuloPostTicket(forms.Form):
 
-    descrizione = forms.CharField(widget=Textarea, min_length=3)
+    descrizione = forms.CharField(widget=Textarea(attrs={'rows': 3,'cols': 15, 'placeholder':'Scrivi un commento...' }), min_length=3, label='')
     #fixme verificare il controllo sulla dimensione massima del file
     allegato = forms.FileField(required=False, validators=[valida_dimensione_file_5mb])
 

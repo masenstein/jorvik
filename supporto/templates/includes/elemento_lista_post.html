@@ -1,22 +1,17 @@
-    <hr>
-    <div class="row allinea-sinistra ">
-        <div class="col-md-3">
-                        <span class="text-muted">
-                            <i class="fa fa-fw fa-user"></i> Mittente
-                        </span><br>
-                        <strong>{{post.fullname}}</strong>
-        </div>
-        <div class="col-md-6">
-                        <span class="text-muted">
-                            <i class="fa fa-fw fa-clock-o"></i> Data invio
-                        </span><br>
-            {{ post.dateline }}
-        </div>
+<div class="panel panel-default">
+
+        <div class="panel-heading">
+        <strong>
+            {{ post.fullname|safe }}
+        </strong>
+
+        <span class="text-muted pull-right">
+            <i class="fa fa-fw fa-clock-o"></i>
+            {{ post.dateline|slice:"0:16" }}
+        </span>
 
     </div>
-    <hr>
-    <div style="padding:0% 6%; ">
-        <p>
-            {{ post.contents| safe }}
-        </p>
+    <div class="panel-body">
+        {{ post.contents| safe }}
     </div>
+</div>
