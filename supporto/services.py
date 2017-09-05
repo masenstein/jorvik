@@ -6,10 +6,10 @@ import random
 import xml.etree.ElementTree as ET
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
-from supporto.models import KbArticle,Ticket, TicketPost, Attachment
+from supporto.models import KbArticle,Ticket, TicketPost, Attachment, RestCache
 from supporto.costanti import *
 import requests
-from jorvik.settings import KAYAKO_SECRET_KEY, KAYAKO_API_KEY, KAYAKO_ENDPOINT
+from jorvik.settings import KAYAKO_SECRET_KEY, KAYAKO_API_KEY, KAYAKO_ENDPOINT,KAYAKO_CACHE_TTL,KAYAKO_CACHE_ENABLED
 
 
 class KayakoRESTService():
@@ -27,6 +27,43 @@ class KayakoRESTService():
         except Exception as e:
             pass
 
+    def _getXMLResponse(self, url, params, method):
+        if method == 'GET':
+            r = requests.get(url, params=params)
+            xml_string = r.text
+        elif method == 'POST':
+            r = Request(url, urlencode(params).encode())
+            xml_string = urlopen(r).read().decode()
+        else:
+            xml_string = None
+
+        return xml_string
+
+    def _getresponse(self, url, params, method='GET'):
+
+        if KAYAKO_CACHE_ENABLED == '0':
+            return ET.fromstring(self._getXMLResponse(url, params, method))
+        else:
+            requestkey = url[len(KAYAKO_ENDPOINT) : ]
+            arr_sorted_keys = sorted(params.keys())
+            for key in arr_sorted_keys:
+                # elimino dalla request i params costanti: salt, apikey, signature
+                if  key not in {'salt', 'apikey', 'signature'} :
+                    requestkey += "/" + str(key) + "/" + str(params[key])
+
+            qs = RestCache.objects.filter(pk=requestkey)
+            if len(qs) == 0 or (len(qs) == 1 and ( (datetime.datetime.now() - qs[0].creazione).total_seconds()) > int(KAYAKO_CACHE_TTL)):
+                xml_string = self._getXMLResponse(url, params, method)
+
+                entry = RestCache(request=requestkey, response=xml_string)
+                entry.save()
+            else:
+                # otteniamo una hit dal db (response recuperata e non scaduta)
+                entry = qs[0]
+                xml_string = entry.response
+
+            return ET.fromstring(xml_string)
+
     def get_departments(self):
         """
         Questo metodo recupera l'elenco completo dei dipartimenti configurati su kayako.
@@ -35,9 +72,8 @@ class KayakoRESTService():
         deptList = []
         url = KAYAKO_ENDPOINT + '/Base/Department'
         try:
-            r = requests.get(url, params=self.params)
 
-            departments = ET.fromstring(r.text)
+            departments = self._getresponse( url, self.params )
             for department in departments:
                 id = department.find('./id').text
                 title = department.find('./title').text
@@ -54,9 +90,8 @@ class KayakoRESTService():
         """
         deptList = []
         url = KAYAKO_ENDPOINT + '/Base/Department'
-        r = requests.get(url, params=self.params)
 
-        departments = ET.fromstring(r.text)
+        departments = self._getresponse( url, self.params )
         for department in departments:
             id = department.find('./id').text
             deptList.append(int(id))
@@ -71,8 +106,7 @@ class KayakoRESTService():
         itemList = []
         url = KAYAKO_ENDPOINT + apiPATH
         try:
-            r = requests.get(url, params=self.params)
-            items = ET.fromstring(r.text)
+            items = self._getresponse( url, self.params )
             for item in items:
                 id = item.find('./id').text
                 title = item.find('./title').text
@@ -195,9 +229,7 @@ class KayakoRESTService():
         url = KAYAKO_ENDPOINT + '/Tickets/Ticket/ListAll/' + strDepartments + '/' + strStatus + '/-1/' + str(
             userid) + '/-1/-1/-1/-1'
 
-        r = requests.get(url, params=self.params)
-
-        tickets = ET.fromstring(r.text)
+        tickets = self._getresponse( url, self.params )
         for ticket in tickets:
             statusId = ticket.find('./statusid').text
             if statusId == str(TICKET_ATTESA_RISPOSTA): in_attesa_di_risposta += 1
@@ -223,12 +255,9 @@ class KayakoRESTService():
             for departmentId in departmentsIdList:
                 strDepartments = strDepartments + str(departmentId) + ','
 
-
             url = KAYAKO_ENDPOINT + '/Tickets/Ticket/ListAll/' + strDepartments + '/' + str(TICKET_ATTESA_RISPOSTA) + '/-1/' + str(userid) + '/-1/-1/-1/-1'
 
-            r = requests.get(url, params=self.params)
-
-            tickets = ET.fromstring(r.text)
+            tickets = self._getresponse( url, self.params )
             for ticket in tickets:
                 statusId = ticket.find('./statusid').text
                 if statusId == str(TICKET_ATTESA_RISPOSTA): in_attesa_di_risposta += 1
@@ -257,11 +286,9 @@ class KayakoRESTService():
         url = KAYAKO_ENDPOINT + '/Tickets/Ticket/ListAll/' + strDepartments + '/' + strStatus + '/-1/' + str(
             userid) + '/-1/-1/-1/-1'
 
-        r = requests.get(url, params=self.params)
-
         ticketList = []
 
-        tickets = ET.fromstring(r.text)
+        tickets = self._getresponse( url, self.params )
         for ticket in tickets:
             ticketItem = Ticket()
             statusId = ticket.find('./statusid').text
@@ -285,10 +312,8 @@ class KayakoRESTService():
 
         url = KAYAKO_ENDPOINT + '/Tickets/Ticket/'+ ticketDisplayID
 
-        r = requests.get(url, params=self.params)
-
         ticketItem = Ticket()
-        tickets = ET.fromstring(r.text)
+        tickets = self._getresponse( url, self.params )
         for ticket in tickets:
             ticketItem.id = ticket.attrib['id']
             ticketItem.email = ticket.find('./email').text
@@ -347,10 +372,8 @@ class KayakoRESTService():
 
         url = KAYAKO_ENDPOINT + '/Tickets/Ticket/'+ ticketDisplayID
 
-        r = requests.get(url, params=self.params)
-
         ticketItem = Ticket()
-        tickets = ET.fromstring(r.text)
+        tickets = self._getresponse( url, self.params )
         for ticket in tickets:
             statusId = ticket.find('./statusid').text
             ticketItem.id = ticket.attrib['id']
@@ -390,8 +413,7 @@ class KayakoRESTService():
 
         url = KAYAKO_ENDPOINT + '/Base/UserSearch'
 
-        r = Request(url, urlencode(self.params).encode())
-        xml = ET.fromstring(urlopen(r).read().decode())
+        xml = self._getresponse(url,self.params,'POST')
         useridElem = xml.find('./user/id', None)
         userid = None if useridElem is None else useridElem.text
 
