@@ -60,7 +60,6 @@
                 </div>
 
             </div>
-            {% if ticket.statusid != TICKET_CHIUSO %}
             <h3>
                 <i class="fa fa-fw fa-comments-o"></i>
                 Commenti
@@ -68,6 +67,7 @@
                     {{ postList|length}}
                 </span>
             </h3>
+            {% if ticket.statusid != TICKET_CHIUSO %}
             <div class="panel panel-primary">
                 <div class="panel-heading">
                     <h2 class="panel-title">
