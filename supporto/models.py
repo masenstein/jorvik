@@ -1,3 +1,11 @@
+from django.db import models
+
+class RestCache(models.Model):
+
+    request = models.TextField(primary_key=True)
+    response = models.TextField()
+    creazione = models.DateTimeField( auto_now=True, db_index=True)
+
 # raccolta di classi con i nomi dei campi reperiti dalle chiamate rest di kayako
 class KbArticle(object):
     kbarticleid = None

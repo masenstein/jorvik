@@ -245,7 +245,10 @@ DOMPDF_ENDPOINT = APIS_CONF.get('dompdf', 'endpoint',
                                 fallback='http://pdf-server.alacriter.uk.92-222-162-128.alacriter.uk/render/www/render.php')
 KAYAKO_SECRET_KEY = APIS_CONF.get('kayako', 'secret_key', fallback=os.environ.get("KAYAKO_SECRET_KEY"))
 KAYAKO_API_KEY = APIS_CONF.get('kayako', 'api_key', fallback=os.environ.get("KAYAKO_API_KEY"))
-KAYAKO_ENDPOINT = APIS_CONF.get('kayako', 'endpoint', fallback=os.environ.get("KAYAKO_API_ENDPOINT"))
+KAYAKO_ENDPOINT = APIS_CONF.get('kayako', 'endpoint', fallback=os.environ.get("KAYAKO_ENDPOINT"))
+KAYAKO_CACHE_TTL = APIS_CONF.get('kayako', 'cache_ttl', fallback=os.environ.get("KAYAKO_CACHE_TTL"))
+KAYAKO_CACHE_ENABLED = APIS_CONF.get('kayako', 'cache_enabled', fallback=os.environ.get("KAYAKO_CACHE_ENABLED"))
+
 
 DESTINATARI_REPORT = ['sviluppo@cri.it', 'info@gaia.cri.it']
 
