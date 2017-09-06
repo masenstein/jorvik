@@ -8,59 +8,7 @@ from supporto.services import KayakoRESTService
 
 
 @pagina_privata
-def supporto_nuova_richiesta_step1(request, me=None):
-    """
-    Carica la pagina di inserimento di un nuovo ticket in cui viene selezionato il dipartimento.
-    Nella pagina e' presente il modulo di ricerca degli articoli nella KB
-    :param request:
-    :param me:
-    :return:
-    """
-    from supporto.forms import ModuloRicercaInKnowledgeBase
-    from supporto.forms import ModuloSceltaDipartimentoTicket
-    modulo = None
-
-    try:
-        moduloRicercaInKnowledgeBase = ModuloRicercaInKnowledgeBase(request.POST or None)
-
-        if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
-
-            keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
-            articleList = KayakoRESTService().get_knowledgebase_results(keyword)
-
-            contesto = {
-                "sezioni": KayakoRESTService().listeTicket(me.email),
-                "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
-                "articleList": articleList
-            }
-            return 'lista_articoli_kb.html', contesto
-
-
-        if me:
-
-            deptList = KayakoRESTService().get_departments()
-            modulo = ModuloSceltaDipartimentoTicket(request.POST or None)
-            modulo.fields['dipartimento'].choices = deptList
-
-        if modulo and modulo.is_valid():
-
-            request.session['dipartimento'] = modulo.cleaned_data['dipartimento']
-            return redirect('/ticket/nuova_richiesta_step2/')
-
-        contesto = {
-            "modulo": modulo,
-            'moduloRicercaInKnowledgeBase': moduloRicercaInKnowledgeBase,
-            'sezioni': KayakoRESTService().listeTicket(me.email)
-        }
-        return 'nuova_richiesta_step1.html', contesto
-    except Exception as e:
-       return errore_generico(request,
-                        titolo="Errore", messaggio="Pagina di supporto al momento non disponibile.",
-                        torna_titolo="Home page", torna_url="/", embed=False)
-
-
-@pagina_privata
-def supporto_nuova_richiesta_step2(request, me=None):
+def supporto_nuova_richiesta(request, me=None):
     """
     Carica la pagina di inserimento di un nuovo ticket in cui vengono inserite le informazioni relative alla segnalazione
     ed eventuali allegati.
@@ -131,7 +79,7 @@ def supporto_nuova_richiesta_step2(request, me=None):
         'moduloRicercaInKnowledgeBase': moduloRicercaInKnowledgeBase,
         'sezioni': KayakoRESTService().listeTicket(me.email)
     }
-    return 'nuova_richiesta_step2.html', contesto
+    return 'nuova_richiesta.html', contesto
 
 
 @pagina_privata
