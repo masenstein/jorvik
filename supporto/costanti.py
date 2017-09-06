@@ -7,4 +7,36 @@ DEFAULT_TICKET_TYPE_ID=1
 DEFAULT_AUTO_USER_ID=1
 
 #MAPPA STATUS_TICKET: codice stato - decrizione stato
-STATUS_TICKET = {"1":"Aperto", "2":"In lavorazione", "3":"Chiuso", "4":"In attesa di risposta"}
+STATUS_TICKET = {str(TICKET_APERTO):"Aperto",
+                 str(TICKET_IN_LAVORAZIONE):"In lavorazione",
+                 str(TICKET_CHIUSO):"Chiuso",
+                 str(TICKET_ATTESA_RISPOSTA):"In attesa di risposta"}
+
+#ID SEZIONI FORM SUPPORTO
+SEZ_INF = "INF"
+SEZ_REQ = "REQ"
+SEZ_INC = "INC"
+SEZ_FEE = "FEE"
+SEZ_BLO = "BLO"
+SEZ_SVI = "SVI"
+
+#TABELLA DI MAPPING ID SEZIONE - DESCRIZIONE SEZIONE
+TIPO_RICHIESTA = (
+    (None, "-- Seleziona una opzione --"),
+    (SEZ_INF, "Informazione: Aiuto con l'utilizzo di Gaia"),
+    (SEZ_REQ, "Richiesta: Modifica informazioni o correzioni"),
+    (SEZ_INC, "Incidente: Errori o segnalazioni di sicurezza"),
+    (SEZ_FEE, "Area VI: Ripristino password e richieste e-mail istituzionali (@cri.it, PEC)"),
+    (SEZ_BLO, "Feedback GAIA (suggerimenti, critiche, idee)"),
+    (SEZ_SVI, "Feedback in merito alla donazione sangue")
+)
+
+#TODO gestire il mapping corretto tra sezione e dipartimento
+#TABELLA DI MAPPING ID SEZIONE - CODICE DIPARTIMENTO
+TIPO_RICHIESTA_DIPARTIMENTO = {SEZ_INF: "137", #TEST API
+                               SEZ_REQ: "137", #TEST API
+                               SEZ_INC: "137", #TEST API
+                               SEZ_FEE: "137", #TEST API
+                               SEZ_BLO: "137", #TEST API
+                               SEZ_SVI: "137"} #TEST API
+

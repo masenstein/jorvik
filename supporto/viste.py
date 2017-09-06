@@ -88,6 +88,8 @@ def supporto_nuova_richiesta_step2(request, me=None):
         return 'lista_articoli_kb.html', contesto
 
     if me:
+        from base.utils import rimuovi_scelte
+
         deleghe = set([d.tipo for d in me.deleghe_attuali()])
         tipi = set((UFFICIO_SOCI, UFFICIO_SOCI_TEMPORANEO, UFFICIO_SOCI_UNITA, PRESIDENTE))
         if deleghe.intersection(tipi):
@@ -95,14 +97,23 @@ def supporto_nuova_richiesta_step2(request, me=None):
         else:
             modulo = ModuloRichiestaTicket(request.POST or None)
 
+        lista_sezioni = modulo.fields['tipo'].choices
+
+        # Rimuovo delle scelte dalla lista delle sezioni
+        if not me.deleghe_attuali().exists():
+            lista_sezioni = rimuovi_scelte([SEZ_REQ, SEZ_INC], lista_sezioni)
+
+        modulo.fields['tipo'].choices = lista_sezioni
+
     if modulo and modulo.is_valid():
         import base64
 
         oggetto = modulo.cleaned_data['oggetto']
         descrizione = modulo.cleaned_data['descrizione']
         persona = modulo.cleaned_data.get('persona', None)
+        id_dipartimento = TIPO_RICHIESTA_DIPARTIMENTO.get(modulo.cleaned_data['tipo'])
 
-        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService().createTicket(mittente=me, subject=oggetto, fullname=me.nome_completo, email=me.email, contents=descrizione, departmentid=request.session.get('dipartimento',None),persona=persona)
+        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService().createTicket(mittente=me, subject=oggetto, fullname=me.nome_completo, email=me.email, contents=descrizione, departmentid=id_dipartimento, persona=persona)
 
         if len(request.FILES) != 0:
             nome_allegato = request.FILES['allegato'].name

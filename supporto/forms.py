@@ -2,6 +2,7 @@ from django import forms
 from django.forms import Textarea
 from autocomplete_light import shortcuts as autocomplete_light
 from anagrafica.validators import valida_dimensione_file_5mb
+from supporto.costanti import *
 
 class ModuloSceltaDipartimentoTicket(forms.Form):
 
@@ -13,6 +14,10 @@ class ModuloRicercaInKnowledgeBase(forms.Form):
 
 
 class ModuloRichiestaTicket(forms.Form):
+
+    tipo = forms.ChoiceField(TIPO_RICHIESTA, required=True, initial=None,
+                                   help_text="Seleziona una delle tipologie di richiesta "
+                                             "per aiutarci a smistarla rapidamente.")
     oggetto = forms.CharField(help_text="Una breve descrizione del problema.", min_length=3, max_length=150)
     descrizione = forms.CharField(widget=Textarea, min_length=3)
     #fixme verificare il controllo sulla dimensione massima del file
