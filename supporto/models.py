@@ -5,6 +5,7 @@ class RestCache(models.Model):
     request = models.TextField(primary_key=True)
     response = models.TextField()
     creazione = models.DateTimeField( auto_now=True, db_index=True)
+    email = models.CharField(max_length=300, null=True)
 
 # raccolta di classi con i nomi dei campi reperiti dalle chiamate rest di kayako
 class KbArticle(object):

@@ -16,14 +16,16 @@ class KayakoRESTService():
     salt = None
     encodedSignature = None
     params = None
+    email = None
 
-    def __init__(self):
+    def __init__(self, user_email):
         try:
             self.salt = str(random.getrandbits(32))
             signature = hmac.new(bytes(KAYAKO_SECRET_KEY, 'utf-8'), msg=self.salt.encode(),
                                  digestmod=hashlib.sha256).digest()
             self.encodedSignature = base64.encodebytes(signature)
             self.params = {'salt': self.salt, 'apikey': KAYAKO_API_KEY, 'signature': self.encodedSignature}
+            self.email = user_email
         except Exception as e:
             pass
 
@@ -55,7 +57,7 @@ class KayakoRESTService():
             if len(qs) == 0 or (len(qs) == 1 and ( (datetime.datetime.now() - qs[0].creazione).total_seconds()) > int(KAYAKO_CACHE_TTL)):
                 xml_string = self._getXMLResponse(url, params, method)
 
-                entry = RestCache(request=requestkey, response=xml_string)
+                entry = RestCache(request=requestkey, response=xml_string, email=self.email)
                 entry.save()
             else:
                 # otteniamo una hit dal db (response recuperata e non scaduta)
@@ -63,6 +65,11 @@ class KayakoRESTService():
                 xml_string = entry.response
 
             return ET.fromstring(xml_string)
+
+    def _clean_user_cache(self):
+
+        RestCache.objects.filter(email=self.email).delete()
+        return
 
     def get_departments(self):
         """
@@ -246,11 +253,11 @@ class KayakoRESTService():
         """
         in_attesa_di_risposta = 0
         try:
-            userid = KayakoRESTService().get_userIdByEmail(userEmail)
+            userid = KayakoRESTService(self.email).get_userIdByEmail(userEmail)
             if userid is None:
                 return 0
 
-            departmentsIdList = KayakoRESTService().get_departments_ids()
+            departmentsIdList = KayakoRESTService(self.email).get_departments_ids()
             strDepartments = ''
             for departmentId in departmentsIdList:
                 strDepartments = strDepartments + str(departmentId) + ','
@@ -426,7 +433,7 @@ class KayakoRESTService():
         :return: una lista di tuple (descrizione, numero, codifica)
         """
 
-        attesa_risposta, in_lavorazione, chiusi = self.get_ticketCounts(KayakoRESTService().get_departments_ids(),[TICKET_APERTO,TICKET_IN_LAVORAZIONE,TICKET_CHIUSO,TICKET_ATTESA_RISPOSTA], self.get_userIdByEmail(email))
+        attesa_risposta, in_lavorazione, chiusi = self.get_ticketCounts(KayakoRESTService(self.email).get_departments_ids(),[TICKET_APERTO,TICKET_IN_LAVORAZIONE,TICKET_CHIUSO,TICKET_ATTESA_RISPOSTA], self.get_userIdByEmail(email))
 
         liste = [('In attesa di risposta', attesa_risposta, 'attesa_risposta'),
                  ('In lavorazione', in_lavorazione, 'in_lavorazione'),
@@ -472,6 +479,8 @@ class KayakoRESTService():
         ticketPostID = tickets.find('./ticket/posts/post/id', None).text
         ticketDisplayID = tickets.find('./ticket/displayid', None).text
 
+        self._clean_user_cache()
+
         return ticketID, ticketPostID, ticketDisplayID
 
 
@@ -482,7 +491,7 @@ class KayakoRESTService():
         """
         params = {'ticketid': ticketId,
                   'contents': contents,
-                  'userid': KayakoRESTService().get_userIdByEmail(me.email),
+                  'userid': KayakoRESTService(me.email).get_userIdByEmail(me.email),
                   'filename': filename,
                   'isprivate': 0
                   }
@@ -494,6 +503,7 @@ class KayakoRESTService():
         url = KAYAKO_ENDPOINT + '/Tickets/TicketPost'
         r = Request(url, urlencode(self.params).encode())
         xml = urlopen(r).read().decode()
+        self._clean_user_cache()
 
         return
 
@@ -532,5 +542,6 @@ class KayakoRESTService():
         url = KAYAKO_ENDPOINT + '/Tickets/Ticket/' + str(ticketId)
         r = Request(url, urlencode(self.params).encode(), method='PUT')
         xml = urlopen(r).read().decode()
+        self._clean_user_cache()
 
         return

@@ -27,7 +27,7 @@ def supporto_nuova_richiesta(request, me=None):
 
         keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
 
-        articleList = KayakoRESTService().get_knowledgebase_results(keyword)
+        articleList = KayakoRESTService(me.email).get_knowledgebase_results(keyword)
 
         contesto = {
             "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
@@ -61,12 +61,12 @@ def supporto_nuova_richiesta(request, me=None):
         persona = modulo.cleaned_data.get('persona', None)
         id_dipartimento = TIPO_RICHIESTA_DIPARTIMENTO.get(modulo.cleaned_data['tipo'])
 
-        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService().createTicket(mittente=me, subject=oggetto, fullname=me.nome_completo, email=me.email, contents=descrizione, departmentid=id_dipartimento, persona=persona)
+        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService(me.email).createTicket(mittente=me, subject=oggetto, fullname=me.nome_completo, email=me.email, contents=descrizione, departmentid=id_dipartimento,persona=persona)
 
         if len(request.FILES) != 0:
             nome_allegato = request.FILES['allegato'].name
             contenuto_allegato = request.FILES['allegato'].read()
-            KayakoRESTService().addTicketAttachment(ticketID, ticketPostID, nome_allegato, base64.encodebytes(contenuto_allegato))
+            KayakoRESTService(me.email).addTicketAttachment(ticketID, ticketPostID, nome_allegato, base64.encodebytes(contenuto_allegato))
 
         return messaggio_generico(request, me, titolo="Richiesta inoltrata",
                                   messaggio="Grazie per aver contattato il supporto. La tua richiesta con "
@@ -77,7 +77,7 @@ def supporto_nuova_richiesta(request, me=None):
     contesto = {
         "modulo": modulo,
         'moduloRicercaInKnowledgeBase': moduloRicercaInKnowledgeBase,
-        'sezioni': KayakoRESTService().listeTicket(me.email)
+        'sezioni': KayakoRESTService(me.email).listeTicket(me.email)
     }
     return 'nuova_richiesta.html', contesto
 
@@ -101,13 +101,13 @@ def supporto_ricerca_kb(request, me=None):
 
         keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
 
-        articleList = KayakoRESTService().get_knowledgebase_results(keyword)
+        articleList = KayakoRESTService(me.email).get_knowledgebase_results(keyword)
 
 
     contesto = {
             "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
             "articleList": articleList,
-            'sezioni': KayakoRESTService().listeTicket(me.email)
+            'sezioni': KayakoRESTService(me.email).listeTicket(me.email)
         }
     return 'lista_articoli_kb.html', contesto
 
@@ -121,11 +121,11 @@ def supporto_dettaglio_kb(request, me, articleID):
     :param articleID: id dell'articolo della KB
     :return:
     """
-    articolo = KayakoRESTService().get_knowledgebase_article(articleID)
+    articolo = KayakoRESTService(me.email).get_knowledgebase_article(articleID)
 
     contesto = {
         "articolo": articolo,
-        'sezioni': KayakoRESTService().listeTicket(me.email)
+        'sezioni': KayakoRESTService(me.email).listeTicket(me.email)
     }
     return 'dettaglio_articolo_kb.html', contesto
 
@@ -176,7 +176,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
     from supporto.costanti import TICKET_CHIUSO, STATUS_TICKET
     from supporto.forms import ModuloPostTicket
 
-    ticket = KayakoRESTService().get_ticketByDisplayID(ticketdisplayID)
+    ticket = KayakoRESTService(me.email).get_ticketByDisplayID(ticketdisplayID)
     #verifico se l'utente è proprietario del ticket
     if ticket.email != me.email:
         return permessi(request, me)
@@ -202,7 +202,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
             if contenuto_allegato:
                 contenuto_allegato_base64 = base64.encodebytes(contenuto_allegato)
 
-            KayakoRESTService().createTicketPost(me, ticket.id, contents, nome_allegato, contenuto_allegato_base64 )
+            KayakoRESTService(me.email).createTicketPost(me, ticket.id, contents, nome_allegato, contenuto_allegato_base64 )
 
             return redirect('/ticket/dettaglio/' + ticketdisplayID)
 
@@ -215,7 +215,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
         'STATUS_TICKET': STATUS_TICKET,
         'TICKET_CHIUSO' : str(TICKET_CHIUSO),
         'modulo' : modulo,
-        'sezioni': KayakoRESTService().listeTicket(me.email),
+        'sezioni': KayakoRESTService(me.email).listeTicket(me.email),
         'postList': postList,
         'attachmentList': attachmentList,
         'hasattachments' : len(attachmentList) > 0
@@ -233,12 +233,12 @@ def supporto_chiudi_ticket(request, me, ticketdisplayID):
     :return:
     """
 
-    ticket = KayakoRESTService().get_ticketLightByDisplayID(ticketdisplayID)
+    ticket = KayakoRESTService(me.email).get_ticketLightByDisplayID(ticketdisplayID)
 
     if not ticket.email == me.email:
         return redirect('/errore/permessi/')
 
-    KayakoRESTService().chiudiTicket(ticket.id)
+    KayakoRESTService(me.email).chiudiTicket(ticket.id)
 
     return redirect('/ticket/dettaglio/' + ticketdisplayID)
 
@@ -247,7 +247,7 @@ def supporto_download_post_attachment(request, me, ticketdisplayID, attachmentID
     """
     Restituisce la response con il contenuto del file allegato a un ticket
     """
-    ticket = KayakoRESTService().get_ticketLightByDisplayID(ticketdisplayID)
+    ticket = KayakoRESTService(me.email).get_ticketLightByDisplayID(ticketdisplayID)
     return download_attachment('/Tickets/TicketAttachment/', ticket.id, attachmentID)
 
 @pagina_privata

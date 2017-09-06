@@ -11,7 +11,7 @@ def download_attachment( endpoint, parentID, attachmentID):
     import base64
     from supporto.services import KayakoRESTService
 
-    attachment = KayakoRESTService().get_attachment(endpoint, parentID, attachmentID)
+    attachment = KayakoRESTService(email=None).get_attachment(endpoint, parentID, attachmentID)
 
     data = base64.b64decode(attachment.contents)
 
@@ -30,11 +30,11 @@ def supporto_get_lista_ticket(statusIdList, titoloPagina, me=None):
     from supporto.costanti import STATUS_TICKET
     from supporto.services import KayakoRESTService
 
-    ticketList = KayakoRESTService().get_ticketListByStatus(KayakoRESTService().get_departments_ids(),statusIdList, KayakoRESTService().get_userIdByEmail(me.email))
+    ticketList = KayakoRESTService(me.email).get_ticketListByStatus(KayakoRESTService(me.email).get_departments_ids(),statusIdList, KayakoRESTService(me.email).get_userIdByEmail(me.email))
 
     contesto = {
         'STATUS_TICKET': STATUS_TICKET,
-        'sezioni': KayakoRESTService().listeTicket(me.email),
+        'sezioni': KayakoRESTService(me.email).listeTicket(me.email),
         'lista_ticket': ticketList,
         'titolo_pagina': titoloPagina
     }

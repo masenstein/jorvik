@@ -6,3 +6,10 @@
 
 # site_key =
 # secret_key =
+
+[kayako]
+secret_key =
+api_key =
+endpoint =
+cache_ttl =
+cache_enabled =
