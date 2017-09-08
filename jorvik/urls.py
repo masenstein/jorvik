@@ -330,7 +330,7 @@ urlpatterns = [
     # OAuth 2.0
     # url(r'^o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     # Integrazione Kayako
-    url(r'^ticket/$', supporto.viste.supporto_nuova_richiesta),
+    url(r'^ticket/$', supporto.viste.supporto_ricerca_kb),
     url(r'^ticket/nuova_richiesta/$', supporto.viste.supporto_nuova_richiesta),
     url(r'^ticket/ricerca_kb/$', supporto.viste.supporto_ricerca_kb),
     url(r'^ticket/attesa_risposta/$', supporto.viste.supporto_attesa_risposta),

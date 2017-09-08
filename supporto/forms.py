@@ -10,7 +10,7 @@ class ModuloSceltaDipartimentoTicket(forms.Form):
 
 class ModuloRicercaInKnowledgeBase(forms.Form):
 
-    cerca = forms.CharField(min_length=3,label='Cerca nella knowledge base', widget= forms.TextInput(attrs={'placeholder':'Come possiamo aiutarti?'}))
+    cerca = forms.CharField(min_length=3,label='', widget= forms.TextInput(attrs={'placeholder':'Es: reset password, richiesta trasferimento...'}))
 
 
 class ModuloRichiestaTicket(forms.Form):

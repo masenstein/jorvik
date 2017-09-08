@@ -1,0 +1,64 @@
+{% extends "anagrafica_utente_vuota.html" %}
+
+{% load bootstrap3 %}
+
+{% block pagina_titolo %}Supporto{% endblock %}
+
+{% block menu_laterale %}
+    {% include "includes/menu_supporto.html" %}
+{% endblock %}
+
+{% block app_contenuto %}
+
+    <div class="container">
+        <div class="col-md-8">
+
+            {% include 'includes/cerca_nella_kb.html' %}
+
+            <br>
+            <!-- Risultato ricerca articoli -->
+                <br/>
+                {% for articolo in articoliRisultatoRicerca %}
+                    <p>
+                        <h4>
+                            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/"><i class="fa fa-fw fa-newspaper-o"></i> {{articolo.subject}}</a>
+                        </h4>
+                    </p>
+                    <div>
+                        <p>{{articolo.contentstext | slice:"0:200"}}...</p>
+                    </div>
+                <br/>
+                {% endfor %}
+                {% if result_count %}
+                    <div class="alert alert-warning alert-block">
+                        <h4><i class="fa fa-info-circle"></i> Nessun articolo trovato</h4>
+                    </div>
+                {% endif %}
+            <!-- Articoli più cercati -->
+            {% if articoliInEvidenza %}
+                <p>
+                    <h4><i class="fa fa-fw fa-newspaper-o"></i> Articoli più cercati...</h4>
+                </p>
+                {% for articolo in articoliInEvidenza %}
+                    <p>
+                        <h4>
+                            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/">{{articolo.subject}}</a>
+                        </h4>
+                    </p>
+                {% endfor %}
+            {% endif %}
+
+            <br>
+            <div>
+                <p>Si è verificato un errore nell'utilizzo di Gaia o non sei riuscito a trovare una soluzione?<br> Invia una <a href="nuova_richiesta">richiesta di supporto</a>.</p>
+            </div>
+
+        </div>
+
+
+</div>
+
+    </div>
+
+{% endblock %}
+

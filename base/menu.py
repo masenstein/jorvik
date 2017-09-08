@@ -236,8 +236,7 @@ def menu(request):
         ),
         "supporto": (
             ("Supporto", (
-                ("Nuovo Ticket", "fa-pencil", "/ticket/nuova_richiesta"),
-                ("Cerca nella KB", "fa-search", "/ticket/ricerca_kb"),
+                ("Cerca negli articoli", "fa-search", "/ticket/"),
             )),
         ),
     }

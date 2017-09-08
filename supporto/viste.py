@@ -18,22 +18,8 @@ def supporto_nuova_richiesta(request, me=None):
     :return:
     """
     from supporto.forms import ModuloRichiestaTicket,ModuloRichiestaTicketPersone
-    from supporto.forms import ModuloRicercaInKnowledgeBase
     modulo = None
 
-    moduloRicercaInKnowledgeBase = ModuloRicercaInKnowledgeBase(request.POST or None)
-
-    if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
-
-        keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
-
-        articleList = KayakoRESTService(me.email).get_knowledgebase_results(keyword)
-
-        contesto = {
-            "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
-            "articleList": articleList
-        }
-        return 'lista_articoli_kb.html', contesto
 
     if me:
         from base.utils import rimuovi_scelte
@@ -76,7 +62,6 @@ def supporto_nuova_richiesta(request, me=None):
 
     contesto = {
         "modulo": modulo,
-        'moduloRicercaInKnowledgeBase': moduloRicercaInKnowledgeBase,
         'sezioni': KayakoRESTService(me.email).listeTicket(me.email)
     }
     return 'nuova_richiesta.html', contesto
@@ -93,23 +78,33 @@ def supporto_ricerca_kb(request, me=None):
     """
     from supporto.forms import ModuloRicercaInKnowledgeBase
 
-    articleList = []
+    articoliRisultatoRicerca = []
+    articoliInEvidenza = []
+    result_count = None
 
     moduloRicercaInKnowledgeBase = ModuloRicercaInKnowledgeBase(request.POST or None)
 
     if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
-
         keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
-
-        articleList = KayakoRESTService(me.email).get_knowledgebase_results(keyword)
+        articoliRisultatoRicerca = KayakoRESTService(me.email).get_knowledgebase_results(keyword)
+        if(len(articoliRisultatoRicerca) == 0):
+             result_count = True
+    else:
+        # TODO implementare query articoli in evidenza
+        articoliInEvidenza.append(KayakoRESTService(me.email).get_knowledgebase_article("13"))
+        articoliInEvidenza.append(KayakoRESTService(me.email).get_knowledgebase_article("10"))
+        articoliInEvidenza.append(KayakoRESTService(me.email).get_knowledgebase_article("11"))
 
 
     contesto = {
-            "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
-            "articleList": articleList,
-            'sezioni': KayakoRESTService(me.email).listeTicket(me.email)
+            "moduloRicercaInKnowledgeBase" : moduloRicercaInKnowledgeBase,
+            "articoliRisultatoRicerca": articoliRisultatoRicerca,
+            "articoliInEvidenza": articoliInEvidenza,
+            "result_count" : result_count,
+            "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
         }
-    return 'lista_articoli_kb.html', contesto
+
+    return 'supporto_base.html', contesto
 
 @pagina_privata
 def supporto_dettaglio_kb(request, me, articleID):

@@ -1,21 +1,13 @@
 {% load bootstrap3 %}
-
-    <div class="panel panel-info">
-        <div class="panel-heading">
-            <h2 class="panel-title">
+    <div class="row">
+        <h3>Hai bisogno di un aiuto?</h3>
+        <h5>Cerca tra i nostri articoli, potresti trovare rapidamente la soluzione al tuo problema</h5>
+            <form method="POST">
+            {% csrf_token %}
+            {% bootstrap_form moduloRicercaInKnowledgeBase %}
+                <button type="submit" class="btn btn-info" style="float:right">
                 <i class="fa fa-fw fa-search"></i>
                 Cerca
-            </h2>
-        </div>
-
-        <div class="panel-body">
-            <form method="POST">
-                {% csrf_token %}
-                {% bootstrap_form moduloRicercaInKnowledgeBase %}
-                <button type="submit" class="btn btn-info" style="float:right">
-                    <i class="fa fa-fw fa-check"></i>
-                    Cerca
                 </button>
             </form>
-        </div>
     </div>

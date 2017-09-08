@@ -18,7 +18,7 @@ class KayakoRESTService():
     params = None
     email = None
 
-    def __init__(self, user_email):
+    def __init__(self, user_email=None):
         try:
             self.salt = str(random.getrandbits(32))
             signature = hmac.new(bytes(KAYAKO_SECRET_KEY, 'utf-8'), msg=self.salt.encode(),
@@ -143,6 +143,51 @@ class KayakoRESTService():
         :return: una lista di tuple: (id, title)
         """
         return self._get_listOfIdTitle('/Tickets/TicketType')
+
+    def get_knowledgebase_categories(self):
+        """
+        Questo metodo recupera l'elenco completo delle categorie della KB.
+        :return: una lista di id
+        """
+        category_id_list = []
+        url = KAYAKO_ENDPOINT + '/Knowledgebase/Category/ListAll/'
+        try:
+
+            r = requests.get(url, params=self.params)
+            categories = ET.fromstring(r.text)
+            for category in categories:
+                id = category.find('./id').text
+                category_id_list.append(id)
+        except Exception as e:
+            pass
+
+        return category_id_list
+
+    def get_knowledgebase_articles_by_category(self, category_id, start, count):
+        """
+        Questo metodo recupera la lista degli articoli della knowledge base che contengono la stringa keyword.
+        :return: una lista di articoli
+        """
+        kbarticlesList = []
+        url = KAYAKO_ENDPOINT + '/Knowledgebase/Article/ListAll/' + str(category_id) + '/' + str(count) + '/' + str(start) + '/'
+
+        r = requests.get(url, params=self.params)
+
+        kbarticles = ET.fromstring(r.text)
+        for kbarticle in kbarticles:
+            kbArticleItem = KbArticle()
+            kbArticleItem.kbarticleid = kbarticle.find('./kbarticleid').text
+            kbArticleItem.dateline = datetime.datetime.fromtimestamp(
+                int(kbarticle.find('./dateline').text)).strftime("%Y-%m-%d %H:%M")
+            kbArticleItem.contents = kbarticle.find('./contents').text
+            kbArticleItem.subject = kbarticle.find('./subject').text
+            if(kbarticle.find('./hasattachments').text == '1'):
+               kbArticleItem.attachments_xml_string = ET.tostring(kbarticle.find('./attachments'), encoding='utf8', method='xml')
+            kbArticleItem.contentstext = kbarticle.find('./contentstext').text
+            kbarticlesList.append(kbArticleItem)
+
+        return kbarticlesList
+
 
     def get_knowledgebase_results(self, keyword=None):
         """
