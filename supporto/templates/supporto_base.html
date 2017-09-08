@@ -21,7 +21,7 @@
                 {% for articolo in articoliRisultatoRicerca %}
                     <p>
                         <h4>
-                            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/"><i class="fa fa-fw fa-newspaper-o"></i> {{articolo.subject}}</a>
+                            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/"><i class="fa fa-fw fa-newspaper-o"></i> {{articolo.subject|safe}}</a>
                         </h4>
                     </p>
                     <div>
@@ -42,7 +42,7 @@
                 {% for articolo in articoliInEvidenza %}
                     <p>
                         <h4>
-                            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/">{{articolo.subject}}</a>
+                            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/">{{articolo.subject|safe}}</a>
                         </h4>
                     </p>
                 {% endfor %}

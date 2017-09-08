@@ -12,7 +12,6 @@ def supporto_nuova_richiesta(request, me=None):
     """
     Carica la pagina di inserimento di un nuovo ticket in cui vengono inserite le informazioni relative alla segnalazione
     ed eventuali allegati.
-    Nella pagina e' presente il modulo di ricerca degli articoli nella KB
     :param request:
     :param me:
     :return:
@@ -77,7 +76,7 @@ def supporto_ricerca_kb(request, me=None):
     :return:
     """
     from supporto.forms import ModuloRicercaInKnowledgeBase
-
+    from supporto.models import KBCache
     articoliRisultatoRicerca = []
     articoliInEvidenza = []
     result_count = None
@@ -86,29 +85,35 @@ def supporto_ricerca_kb(request, me=None):
 
     if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
         keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
-        articoliRisultatoRicerca = KayakoRESTService(me.email).get_knowledgebase_results(keyword)
+
+        articoliRisultatoRicerca = []
+        qs_articles = KBCache.objects.filter(contentstext__icontains=keyword)
+        if(qs_articles):
+            for kbcache in qs_articles:
+                articoliRisultatoRicerca.append(kbcache.to_KBArticle())
+
         if(len(articoliRisultatoRicerca) == 0):
              result_count = True
     else:
-        # TODO implementare query articoli in evidenza
-        articoliInEvidenza.append(KayakoRESTService(me.email).get_knowledgebase_article("13"))
-        articoliInEvidenza.append(KayakoRESTService(me.email).get_knowledgebase_article("10"))
-        articoliInEvidenza.append(KayakoRESTService(me.email).get_knowledgebase_article("11"))
 
+        qs_articles = KBCache.objects.filter().order_by('-viewcount')[:3]
+        if(qs_articles):
+            for kbcache in qs_articles:
+                articoliInEvidenza.append(kbcache.to_KBArticle())
 
-    contesto = {
-            "moduloRicercaInKnowledgeBase" : moduloRicercaInKnowledgeBase,
-            "articoliRisultatoRicerca": articoliRisultatoRicerca,
-            "articoliInEvidenza": articoliInEvidenza,
-            "result_count" : result_count,
-            "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
-        }
+        contesto = {
+                "moduloRicercaInKnowledgeBase" : moduloRicercaInKnowledgeBase,
+                "articoliRisultatoRicerca": articoliRisultatoRicerca,
+                "articoliInEvidenza": articoliInEvidenza,
+                "result_count" : result_count,
+                "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
+            }
 
     return 'supporto_base.html', contesto
 
 @pagina_privata
 def supporto_dettaglio_kb(request, me, articleID):
-
+    from supporto.models import KBCache
     """
     Visualizza il dettaglio di un articolo della knowledgebase e relativi allegati.
     :param request:
@@ -116,12 +121,15 @@ def supporto_dettaglio_kb(request, me, articleID):
     :param articleID: id dell'articolo della KB
     :return:
     """
-    articolo = KayakoRESTService(me.email).get_knowledgebase_article(articleID)
+    kbcache_item = KBCache.objects.get(pk=articleID)
+    articolo = kbcache_item.to_KBArticle()
 
     contesto = {
         "articolo": articolo,
         'sezioni': KayakoRESTService(me.email).listeTicket(me.email)
     }
+
+
     return 'dettaglio_articolo_kb.html', contesto
 
 

@@ -11,7 +11,7 @@ def download_attachment( endpoint, parentID, attachmentID):
     import base64
     from supporto.services import KayakoRESTService
 
-    attachment = KayakoRESTService(email=None).get_attachment(endpoint, parentID, attachmentID)
+    attachment = KayakoRESTService(None).get_attachment(endpoint, parentID, attachmentID)
 
     data = base64.b64decode(attachment.contents)
 

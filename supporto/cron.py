@@ -11,4 +11,5 @@ class CronAggiornaKBCache(CronJobBase):
     code = 'supporto.aggiorna_kb_cache'
 
     def do(self):
+        # python3 manage.py runcrons "supporto.cron.CronAggiornaKBCache" --force
         KBCache.aggiorna_kb_cache(article_interval=self.ARTICLE_INTERVAL)

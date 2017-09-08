@@ -49,6 +49,29 @@ class KBCache(models.Model):
         # elimina da KBCache gli articoli non più presenti nella KB Remota
         KBCache.objects.filter(lastupdate__lt=lastupdate).delete()
 
+    def to_KBArticle(cls):
+        import xml.etree.ElementTree as ET
+
+        article = KbArticle()
+        article.kbarticleid=cls.articleid
+        article.subject=cls.subject
+        article.contents=cls.contents
+        article.contentstext=cls.contentstext
+
+        articleAttachmentList = []
+        articleAttachmentItem = Attachment()
+        if cls.attachments:
+            articleAttachments = ET.fromstring(cls.attachments)
+            for articleAttachment in articleAttachments:
+                articleAttachmentItem.id = articleAttachment.find('./id').text
+                articleAttachmentItem.filename = articleAttachment.find('./filename').text
+                articleAttachmentItem.filesize = articleAttachment.find('./filesize').text
+                articleAttachmentList.append(articleAttachmentItem)
+
+        article.attachmentList = articleAttachmentList
+
+        return article
+
 
 # raccolta di classi con i nomi dei campi reperiti dalle chiamate rest di kayako
 class KbArticle(object):
