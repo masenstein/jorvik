@@ -116,6 +116,7 @@ def supporto_dettaglio_kb(request, me, articleID):
     from supporto.models import KBCache
     """
     Visualizza il dettaglio di un articolo della knowledgebase e relativi allegati.
+    Incrementa il numero di visite all'articolo nella tabella KBCache
     :param request:
     :param me:
     :param articleID: id dell'articolo della KB
@@ -123,6 +124,8 @@ def supporto_dettaglio_kb(request, me, articleID):
     """
     kbcache_item = KBCache.objects.get(pk=articleID)
     articolo = kbcache_item.to_KBArticle()
+    kbcache_item.viewcount += 1
+    kbcache_item.save()
 
     contesto = {
         "articolo": articolo,
