@@ -124,8 +124,17 @@ def supporto_dettaglio_kb(request, me, articleID):
     """
     kbcache_item = KBCache.objects.get(pk=articleID)
     articolo = kbcache_item.to_KBArticle()
-    kbcache_item.viewcount += 1
-    kbcache_item.save()
+
+    #verifico che l'articolo non sia gia' stato visualizzato dall'articolo
+    if 'lista_articoli_letti' not in request.session:
+        request.session['lista_articoli_letti'] = []
+
+    lista_articoli_letti = request.session['lista_articoli_letti']
+    if articleID not in lista_articoli_letti:
+        lista_articoli_letti.append(articleID)
+        request.session['lista_articoli_letti'] = lista_articoli_letti
+        kbcache_item.viewcount += 1
+        kbcache_item.save()
 
     contesto = {
         "articolo": articolo,
