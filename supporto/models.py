@@ -8,12 +8,17 @@ class RestCache(models.Model):
     email = models.CharField(max_length=300, null=True)
 
 class KBCache(models.Model):
+
+    class Meta:
+        verbose_name = "Articolo Knowledge Base di Kayako"
+        verbose_name_plural = "Articoli Knowledge Base di Kayako"
+
     articleid = models.IntegerField(primary_key=True)
     contents = models.TextField()
     contentstext = models.TextField()
     subject = models.TextField()
     dateline = models.DateTimeField()
-    attachments = models.TextField(null=True) #xml contenente la lista degli allegati all'articolo
+    attachments = models.TextField(null=True,blank=True) #xml contenente la lista degli allegati all'articolo
     viewcount = models.IntegerField(default=0) #numero di visualizzazioni dell'articolo da parte di un utente
     lastupdate = models.DateTimeField(db_index=True) #timestamp di inserimento/aggiornamento della riga in tabella
 
