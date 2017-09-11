@@ -101,13 +101,13 @@ def supporto_ricerca_kb(request, me=None):
             for kbcache in qs_articles:
                 articoliInEvidenza.append(kbcache.to_KBArticle())
 
-        contesto = {
-                "moduloRicercaInKnowledgeBase" : moduloRicercaInKnowledgeBase,
-                "articoliRisultatoRicerca": articoliRisultatoRicerca,
-                "articoliInEvidenza": articoliInEvidenza,
-                "result_count" : result_count,
-                "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
-            }
+    contesto = {
+            "moduloRicercaInKnowledgeBase" : moduloRicercaInKnowledgeBase,
+            "articoliRisultatoRicerca": articoliRisultatoRicerca,
+            "articoliInEvidenza": articoliInEvidenza,
+            "result_count" : result_count,
+            "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
+        }
 
     return 'supporto_base.html', contesto
 
