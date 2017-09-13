@@ -12,7 +12,6 @@ class ModuloRicercaInKnowledgeBase(forms.Form):
 
     cerca = forms.CharField(min_length=3,label='', widget= forms.TextInput(attrs={'placeholder':'Es: reset password, richiesta trasferimento...'}))
 
-
 class ModuloRichiestaTicket(forms.Form):
 
     tipo = forms.ChoiceField(TIPO_RICHIESTA, required=True, initial=None,
@@ -22,6 +21,8 @@ class ModuloRichiestaTicket(forms.Form):
     descrizione = forms.CharField(widget=Textarea, min_length=3)
     #fixme verificare il controllo sulla dimensione massima del file
     allegato = forms.FileField(required=False, validators=[valida_dimensione_file_5mb])
+
+    field_order = ('tipo','oggetto','descrizione','allegato')
 
 
 class ModuloPostTicket(forms.Form):
@@ -39,4 +40,4 @@ class ModuloRichiestaTicketPersone(ModuloRichiestaTicket):
         required=False
     )
 
-    field_order = ('dipartimentoID', 'oggetto', 'persona', 'descrizione','allegato')
+    field_order = ('tipo', 'dipartimentoID', 'oggetto', 'persona', 'descrizione','allegato')

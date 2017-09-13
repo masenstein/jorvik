@@ -46,7 +46,7 @@ def supporto_nuova_richiesta(request, me=None):
         persona = modulo.cleaned_data.get('persona', None)
         id_dipartimento = TIPO_RICHIESTA_DIPARTIMENTO.get(modulo.cleaned_data['tipo'])
 
-        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService(me.email).createTicket(mittente=me, subject=oggetto, fullname=me.nome_completo, email=me.email, contents=descrizione, departmentid=id_dipartimento,persona=persona)
+        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService(me.email).createTicket(mittente=me, subject=oggetto, fullname=me.nome_completo, email=me.email, contents=descrizione, department_id=id_dipartimento, persona=persona)
 
         if len(request.FILES) != 0:
             nome_allegato = request.FILES['allegato'].name
@@ -63,7 +63,7 @@ def supporto_nuova_richiesta(request, me=None):
         "modulo": modulo,
         'sezioni': KayakoRESTService(me.email).listeTicket(me.email)
     }
-    return 'nuova_richiesta.html', contesto
+    return 'supporto_nuova_richiesta.html', contesto
 
 
 @pagina_privata
@@ -77,6 +77,7 @@ def supporto_ricerca_kb(request, me=None):
     """
     from supporto.forms import ModuloRicercaInKnowledgeBase
     from supporto.models import KBCache
+    from django.db.models import Q
     articoliRisultatoRicerca = []
     articoliInEvidenza = []
     result_count = None
@@ -87,7 +88,7 @@ def supporto_ricerca_kb(request, me=None):
         keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
 
         articoliRisultatoRicerca = []
-        qs_articles = KBCache.objects.filter(contentstext__icontains=keyword)
+        qs_articles = KBCache.objects.filter(Q(contents__icontains=keyword) | Q(subject__icontains=keyword))
         if(qs_articles):
             for kbcache in qs_articles:
                 articoliRisultatoRicerca.append(kbcache.to_KBArticle())
@@ -109,7 +110,7 @@ def supporto_ricerca_kb(request, me=None):
             "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
         }
 
-    return 'supporto_base.html', contesto
+    return 'supporto_home.html', contesto
 
 @pagina_privata
 def supporto_dettaglio_kb(request, me, articleID):
@@ -142,7 +143,7 @@ def supporto_dettaglio_kb(request, me, articleID):
     }
 
 
-    return 'dettaglio_articolo_kb.html', contesto
+    return 'supporto_dettaglio_articolo_kb.html', contesto
 
 
 @pagina_privata
