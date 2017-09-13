@@ -21,11 +21,11 @@
                 {% for articolo in articoliRisultatoRicerca %}
                     <p>
                         <h4>
-                            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/"><i class="fa fa-fw fa-newspaper-o"></i> {{articolo.subject|safe}}</a>
+                            <a href="/ticket/dettaglio_kb/{{articolo.kb_article_id}}/"><i class="fa fa-fw fa-newspaper-o"></i> {{articolo.subject|safe}}</a>
                         </h4>
                     </p>
                     <div>
-                        <p>{{articolo.contentstext | slice:"0:200"}}...</p>
+                        <p>{{articolo.contents_text | slice:"0:200"}}...</p>
                     </div>
                 <br/>
                 {% endfor %}
@@ -42,7 +42,7 @@
                 {% for articolo in articoliInEvidenza %}
                     <p>
                         <h4>
-                            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/">{{articolo.subject|safe}}</a>
+                            <a href="/ticket/dettaglio_kb/{{articolo.kb_article_id}}/">{{articolo.subject|safe}}</a>
                         </h4>
                     </p>
                 {% endfor %}

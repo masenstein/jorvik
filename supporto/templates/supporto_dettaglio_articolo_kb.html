@@ -32,7 +32,7 @@
                         {% for attachment in articolo.attachmentList %}
                             <div class="allinea-sinistra"  style="padding-top: 2%">
                                 <div class="col-md-6">
-                                    <a href="/ticket/download_kb_attachment/{{ articolo.kbarticleid}}/{{ attachment.id}}" > {{ attachment.filename }}</a>
+                                    <a href="/ticket/download_kb_attachment/{{ articolo.kb_article_id}}/{{ attachment.id}}" > {{ attachment.filename }}</a>
                                 </div>
                             </div>
                         {% endfor %}

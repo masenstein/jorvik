@@ -158,6 +158,7 @@ class KayakoRESTService:
             for category in categories:
                 id = category.find('./id').text
                 category_id_list.append(id)
+
         except Exception as e:
             pass
 
@@ -176,14 +177,15 @@ class KayakoRESTService:
         kb_articles = ET.fromstring(r.text)
         for kb_article in kb_articles:
             kb_article_item = KbArticle()
-            kb_article_item.kbarticleid = kb_article.find('./kbarticleid').text
+            kb_article_item.kb_article_id = kb_article.find('./kbarticleid').text
             kb_article_item.dateline = datetime.datetime.fromtimestamp(
                 int(kb_article.find('./dateline').text)).strftime("%Y-%m-%d %H:%M")
             kb_article_item.contents = kb_article.find('./contents').text
             kb_article_item.subject = kb_article.find('./subject').text
-            if kb_article.find('./hasattachments').text == '1' :
+            if kb_article.find('./hasattachments').text == '1':
                 kb_article_item.attachments_xml_string = ET.tostring(kb_article.find('./attachments'), encoding='utf8', method='xml')
-                kb_article_item.contentstext = kb_article.find('./contentstext').text
+
+            kb_article_item.contents_text = kb_article.find('./contentstext').text
             kb_articles_list.append(kb_article_item)
 
         return kb_articles_list
@@ -201,14 +203,14 @@ class KayakoRESTService:
         kb_articles = ET.fromstring(r.text)
         for kb_article in kb_articles:
             kb_article_item = KbArticle()
-            kb_article_item.kbarticleid = kb_article.find('./kbarticleid').text
+            kb_article_item.kb_article_id = kb_article.find('./kbarticleid').text
             kb_article_item.dateline = datetime.datetime.fromtimestamp(
                 int(kb_article.find('./dateline').text)).strftime("%d/%m/%Y %H:%M")
             kb_article_item.contents = kb_article.find('./contents').text
             kb_article_item.subject = kb_article.find('./subject').text
             kb_article_item.author = kb_article.find('./author').text
-            kb_article_item.contentstext = kb_article.find('./contentstext').text
-            if keyword in kb_article_item.contentstext:
+            kb_article_item.contents_text = kb_article.find('./contentstext').text
+            if keyword in kb_article_item.contents_text:
                 kb_articles_list.append(kb_article_item)
 
         return kb_articles_list
@@ -225,14 +227,14 @@ class KayakoRESTService:
         kb_article_item = KbArticle()
         kb_articles = ET.fromstring(r.text)
         for kb_article in kb_articles:
-            kb_article_item.kbarticleid = kb_article.find('./kbarticleid').text
+            kb_article_item.kb_article_id = kb_article.find('./kbarticleid').text
             kb_article_item.dateline = datetime.datetime.fromtimestamp(
                 int(kb_article.find('./dateline').text)).strftime("%d/%m/%Y %H:%M")
             kb_article_item.contents = kb_article.find('./contents').text
             kb_article_item.subject = kb_article.find('./subject').text
             kb_article_item.author = kb_article.find('./author').text
-            kb_article_item.contentstext = kb_article.find('./contentstext').text
-            kb_article_item.attachmentList = self.get_knowledgebase_attachments(kb_article_item.kbarticleid)
+            kb_article_item.contents_text = kb_article.find('./contentstext').text
+            kb_article_item.attachmentList = self.get_knowledgebase_attachments(kb_article_item.kb_article_id)
 
         return kb_article_item
 

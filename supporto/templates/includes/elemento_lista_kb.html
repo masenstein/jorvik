@@ -2,11 +2,11 @@
     <div class="panel-heading">
         <h4 class="panel-title">
             <i class="fa fa-fw fa-newspaper-o"></i>
-            <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/">{{articolo.subject}}</a>
+            <a href="/ticket/dettaglio_kb/{{articolo.kb_article_id}}/">{{articolo.subject}}</a>
         </h4>
     </div>
     <div class="panel-body">
-        <p>{{articolo.contentstext | slice:"0:300"}}...</p>
-        <a href="/ticket/dettaglio_kb/{{articolo.kbarticleid}}/">Continua a leggere....</a>
+        <p>{{articolo.contents_text | slice:"0:300"}}...</p>
+        <a href="/ticket/dettaglio_kb/{{articolo.kb_article_id}}/">Continua a leggere....</a>
     </div>
 </div>

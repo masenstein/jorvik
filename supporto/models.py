@@ -40,9 +40,9 @@ class KBCache(models.Model):
                 # per ogni articolo salvo/aggiorno l'articolo sulla tabella KBCache
                 for kb_article in kb_articles:
                     # salvo/aggiorno
-                    KBCache.objects.update_or_create(articleid=kb_article.kbarticleid, defaults={
+                    KBCache.objects.update_or_create(articleid=kb_article.kb_article_id, defaults={
                         'contents': kb_article.contents,
-                        'contentstext': kb_article.contentstext,
+                        'contentstext': kb_article.contents_text,
                         'subject': kb_article.subject,
                         'dateline': kb_article.dateline,
                         'attachments': kb_article.attachments_xml_string,
@@ -58,40 +58,41 @@ class KBCache(models.Model):
         import xml.etree.ElementTree as ET
 
         article = KbArticle()
-        article.kbarticleid=cls.articleid
-        article.subject=cls.subject
-        article.contents=cls.contents
-        article.contentstext=cls.contentstext
+        article.kb_article_id = cls.articleid
+        article.subject = cls.subject
+        article.contents = cls.contents
+        article.contents_text = cls.contentstext
 
-        articleAttachmentList = []
-        articleAttachmentItem = Attachment()
+        article_attachment_list = []
+        article_attachment_item = Attachment()
         if cls.attachments:
-            articleAttachments = ET.fromstring(cls.attachments)
-            for articleAttachment in articleAttachments:
-                articleAttachmentItem.id = articleAttachment.find('./id').text
-                articleAttachmentItem.filename = articleAttachment.find('./filename').text
-                articleAttachmentItem.filesize = articleAttachment.find('./filesize').text
-                articleAttachmentList.append(articleAttachmentItem)
+            article_attachments = ET.fromstring(cls.attachments)
+            for article_attachment in article_attachments:
+                article_attachment_item.id = article_attachment.find('./id').text
+                article_attachment_item.filename = article_attachment.find('./filename').text
+                article_attachment_item.filesize = article_attachment.find('./filesize').text
+                article_attachment_list.append(article_attachment_item)
 
-        article.attachmentList = articleAttachmentList
+        article.attachmentList = article_attachment_list
 
         return article
 
 
 # raccolta di classi con i nomi dei campi reperiti dalle chiamate rest di kayako
 class KbArticle(object):
-    kbarticleid = None
+    kb_article_id = None
     subject = None
-    contentstext = None
+    contents_text = None
     contents = None
     author = None
     dateline = None
-    attachmentList = []
+    attachment_list = []
     attachments_xml_string = None
 
     def __repr__(self):
-        return ('kbarticleid={}, subject={}, contentstext={}, contents={}, author={}, dateline={}'.format(self.kbarticleid, self.subject,
-                                                                                  self.contentstext, self.contents, self.author, self.dateline))
+        return ('kb_article_id={}, subject={}, contents_text={}, contents={}, author={}, dateline={}'
+                .format(self.kb_article_id, self.subject, self.contents_text, self.contents, self.author, self.dateline))
+
 class TicketPost(object):
     id = None
     dateline = None
