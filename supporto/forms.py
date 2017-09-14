@@ -1,8 +1,9 @@
 from django import forms
 from django.forms import Textarea
 from autocomplete_light import shortcuts as autocomplete_light
-from anagrafica.validators import valida_dimensione_file_5mb
+
 from supporto.costanti import *
+from supporto.validators import valida_dimensione_file_2mb
 
 class ModuloSceltaDipartimentoTicket(forms.Form):
 
@@ -19,8 +20,7 @@ class ModuloRichiestaTicket(forms.Form):
                                              "per aiutarci a smistarla rapidamente.")
     oggetto = forms.CharField(help_text="Una breve descrizione del problema.", min_length=3, max_length=150)
     descrizione = forms.CharField(widget=Textarea, min_length=3)
-    #fixme verificare il controllo sulla dimensione massima del file
-    allegato = forms.FileField(required=False, validators=[valida_dimensione_file_5mb])
+    allegato = forms.FileField(required=False, validators=[valida_dimensione_file_2mb])
 
     field_order = ('tipo','oggetto','descrizione','allegato')
 
@@ -28,8 +28,7 @@ class ModuloRichiestaTicket(forms.Form):
 class ModuloPostTicket(forms.Form):
 
     descrizione = forms.CharField(widget=Textarea(attrs={'rows': 3,'cols': 15, 'placeholder':'Scrivi un commento...' }), min_length=3, label='')
-    #fixme verificare il controllo sulla dimensione massima del file
-    allegato = forms.FileField(required=False, validators=[valida_dimensione_file_5mb])
+    allegato = forms.FileField(required=False, validators=[valida_dimensione_file_2mb])
 
 
 class ModuloRichiestaTicketPersone(ModuloRichiestaTicket):
@@ -40,4 +39,4 @@ class ModuloRichiestaTicketPersone(ModuloRichiestaTicket):
         required=False
     )
 
-    field_order = ('tipo', 'dipartimentoID', 'oggetto', 'persona', 'descrizione','allegato')
+    field_order = ('tipo', 'dipartimentoID', 'oggetto', 'persona', 'descrizione', 'allegato')

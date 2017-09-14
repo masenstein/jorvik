@@ -1,4 +1,6 @@
 from django.db import models
+import xml.etree.ElementTree as ET
+
 
 class RestCache(models.Model):
 
@@ -55,7 +57,6 @@ class KBCache(models.Model):
         KBCache.objects.filter(lastupdate__lt=lastupdate).delete()
 
     def to_KBArticle(cls):
-        import xml.etree.ElementTree as ET
 
         article = KbArticle()
         article.kb_article_id = cls.articleid

@@ -68,7 +68,14 @@ class KayakoRESTService:
 
     def _clean_user_cache(self):
 
-        RestCache.objects.filter(email=self.email).delete()
+        try:
+            RestCache.objects.filter(email=self.email).delete()
+        except Exception as e:
+            import logging
+            logger = logging.getLogger('supporto')
+            logger.warning('MSG %s: ' % e)
+            pass
+
         return
 
     def get_departments(self):
@@ -507,12 +514,12 @@ class KayakoRESTService:
             "mittente": mittente,
             "persona": persona
         }
-        m = get_template("supporto_modello_testo_ticket.html").render(corpo)
+        ticket_contents = get_template("supporto_modello_testo_ticket.html").render(corpo)
 
         params = {'subject': subject,
                   'fullname': fullname,
                   'email': email,
-                  'contents': m,
+                  'contents': ticket_contents,
                   'departmentid': department_id,
                   'ticketstatusid': ticket_status_id,
                   'ticketpriorityid': ticket_priority_id,

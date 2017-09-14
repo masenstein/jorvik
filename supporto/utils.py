@@ -1,5 +1,7 @@
-def download_attachment( endpoint, parentID, attachmentID):
+from base.errori import errore_generico
 
+
+def download_attachment(endpoint, parentID, attachmentID):
     """
     Questo metodo recupera un attachment richiamando /$endpoint$/$parendID$/$attachmentID$/
     :param endpoint: il relative path dell'endpoint da richiamare per ottenere l'xml con i metadati ed il contenuto dell'allegato
@@ -20,6 +22,7 @@ def download_attachment( endpoint, parentID, attachmentID):
     response['Content-Length'] = attachment.filesize
     return response
 
+
 def supporto_get_lista_ticket(statusIdList, titoloPagina, me=None):
     """
     Questo metodo recupera i ticket che si trovano in uno stato della lista statusIdList e li mostra in un template supporto_lista_ticket
@@ -30,7 +33,10 @@ def supporto_get_lista_ticket(statusIdList, titoloPagina, me=None):
     from supporto.costanti import STATUS_TICKET
     from supporto.services import KayakoRESTService
 
-    ticketList = KayakoRESTService(me.email).get_ticketListByStatus(KayakoRESTService(me.email).get_departments_ids(),statusIdList, KayakoRESTService(me.email).get_userIdByEmail(me.email))
+    ticketList = KayakoRESTService(me.email).get_ticketListByStatus(KayakoRESTService(me.email).get_departments_ids(),
+                                                                    statusIdList,
+                                                                    KayakoRESTService(me.email).get_userIdByEmail(
+                                                                        me.email))
 
     contesto = {
         'STATUS_TICKET': STATUS_TICKET,
@@ -40,3 +46,12 @@ def supporto_get_lista_ticket(statusIdList, titoloPagina, me=None):
     }
 
     return 'supporto_lista_ticket.html', contesto
+
+
+def supporto_errore_generico(request, me, e):
+    import logging
+    logger = logging.getLogger('supporto')
+    logger.error('MSG %s: ' % e)
+
+    return errore_generico(titolo="Errore", messaggio="Si è verificato un errore durante l'esecuzione dell'operazione.",
+                           request=request)
