@@ -92,7 +92,6 @@ def supporto_ricerca_kb(request, me=None):
     """
     from supporto.forms import ModuloRicercaInKnowledgeBase
     from supporto.models import KBCache
-    from django.db.models import Q
     articoliRisultatoRicerca = []
     articoliInEvidenza = []
     result_count = None
@@ -103,11 +102,7 @@ def supporto_ricerca_kb(request, me=None):
         if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
             keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
 
-            articoliRisultatoRicerca = []
-            qs_articles = KBCache.objects.filter(Q(contents__icontains=keyword) | Q(subject__icontains=keyword))
-            if (qs_articles):
-                for kbcache in qs_articles:
-                    articoliRisultatoRicerca.append(kbcache.to_KBArticle())
+            articoliRisultatoRicerca = KBCache.cerca_articoli(keyword)
 
             if (len(articoliRisultatoRicerca) == 0):
                 result_count = True

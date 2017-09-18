@@ -293,7 +293,7 @@ urlpatterns = [
     url(r'^formazione/corsi-base/(?P<pk>[0-9]+)/fine/$', formazione.viste.formazione_corsi_base_fine),
 
     #url(r'^supporto/$', base.viste.supporto)
-    url(r'^supporto/$', supporto.viste.supporto_ricerca_kb),
+    url(r'^supporto/$', base.viste.redirect_semplice, {"nuovo_url": "/ticket/"}),
 
     url(r'^geo/localizzatore/imposta/$', base.viste.geo_localizzatore_imposta),
     url(r'^geo/localizzatore/$', base.viste.geo_localizzatore),

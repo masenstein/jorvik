@@ -13,12 +13,12 @@ STATUS_TICKET = {str(TICKET_APERTO):"Aperto",
                  str(TICKET_ATTESA_RISPOSTA):"In attesa di risposta"}
 
 #ID SEZIONI FORM SUPPORTO
-SEZ_INF = "INF"
-SEZ_REQ = "REQ"
-SEZ_INC = "INC"
-SEZ_FEE = "FEE"
-SEZ_BLO = "BLO"
-SEZ_SVI = "SVI"
+SEZ_INF = "INF" #PRIMO LIVELLO
+SEZ_REQ = "REQ" #SECONDO LIVELLO
+SEZ_INC = "INC" #TERZO LIVELLO
+SEZ_FEE = "FEE" #FEEDBACK
+SEZ_BLO = "BLO" #SANGUE
+SEZ_SVI = "SVI" #AREA SVILUPPO
 
 #TABELLA DI MAPPING ID SEZIONE - DESCRIZIONE SEZIONE
 TIPO_RICHIESTA = (
@@ -26,9 +26,9 @@ TIPO_RICHIESTA = (
     (SEZ_INF, "Informazione: Aiuto con l'utilizzo di Gaia"),
     (SEZ_REQ, "Richiesta: Modifica informazioni o correzioni"),
     (SEZ_INC, "Incidente: Errori o segnalazioni di sicurezza"),
-    (SEZ_FEE, "Area VI: Ripristino password e richieste e-mail istituzionali (@cri.it, PEC)"),
-    (SEZ_BLO, "Feedback GAIA (suggerimenti, critiche, idee)"),
-    (SEZ_SVI, "Feedback in merito alla donazione sangue")
+    (SEZ_SVI, "Area VI: Ripristino password e richieste e-mail istituzionali (@cri.it, PEC)"),
+    (SEZ_BLO, "Feedback in merito alla donazione sangue"),
+    (SEZ_FEE, "Feedback GAIA (suggerimenti, critiche, idee)")
 )
 
 #TODO gestire il mapping corretto tra sezione e dipartimento

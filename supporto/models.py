@@ -1,5 +1,6 @@
 from django.db import models
 import xml.etree.ElementTree as ET
+from django.db.models import Q
 
 
 class RestCache(models.Model):
@@ -55,6 +56,17 @@ class KBCache(models.Model):
 
         # elimina da KBCache gli articoli non più presenti nella KB Remota
         KBCache.objects.filter(lastupdate__lt=lastupdate).delete()
+
+    @staticmethod
+    def cerca_articoli(keyword):
+
+        articoliRisultatoRicerca = []
+        qs_articles = KBCache.objects.filter(Q(contents__icontains=keyword) | Q(subject__icontains=keyword))
+        if (qs_articles):
+            for kbcache in qs_articles:
+                articoliRisultatoRicerca.append(kbcache.to_KBArticle())
+
+        return articoliRisultatoRicerca
 
     def to_KBArticle(cls):
 
