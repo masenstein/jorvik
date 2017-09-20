@@ -40,6 +40,51 @@ from supporto.models import KBCache
 
 class TestSupporto(TestCase):
 
+    def test_create_ticket(self):
+        import base64
+        email = 'massimo.carbone@gmail.com'
+
+        #creo il ticket
+        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService(email).createTicket(mittente="Nome Cognome",
+                                                                                           subject="Ticket test",
+                                                                                           fullname="Nome Cognome",
+                                                                                           email=email,
+                                                                                           contents="Descrizione test",
+                                                                                           department_id="137",
+                                                                                           persona=None)
+
+        self.assertTrue(int(ticketID) > 0, "Ticket non creato su Kayako")
+
+        #recupero il dettaglio del ticket
+        ticket = KayakoRESTService(email).get_ticketLightByDisplayID(ticketDisplayID)
+        self.assertTrue(email ==  ticket.email, "Email nel dettaglio ticket non coincide con il ticket creato")
+        self.assertTrue(ticketID ==  ticket.id, "Id nel dettaglio ticket non coincide con il ticket creato")
+
+        #aggiungo un allegato al ticket appena creato
+        KayakoRESTService(email).addTicketAttachment(ticketID, ticketPostID,
+                                                     "file_test.txt",
+                                                     "YWxsZWdhdG8gZGkgdGVzdA==")
+
+        lista_allegati = KayakoRESTService(email).getTicketAttachments(ticketID)
+
+        self.assertTrue(len(lista_allegati) == 1)
+
+        #aggiungo un commento al ticket
+        KayakoRESTService(email).createTicketPost(email, ticket.id,
+                                                  "commento di test",
+                                                  "file_test_2.txt",
+                                                  "YWxsZWdhdG8gZGkgdGVzdA==")
+
+        ticket_item = KayakoRESTService(email).get_ticketByDisplayID(ticketDisplayID)
+
+        self.assertTrue(len(ticket_item.ticketPostItemList) == 2, "Commenti non presenti nel ticket creato")
+
+
+        #chiudo il ticket
+        KayakoRESTService().chiudiTicket(ticketID)
+        ticket_item_2 = KayakoRESTService(email).get_ticketByDisplayID(ticketDisplayID)
+        self.assertTrue(int(ticket_item_2.statusid) == TICKET_CHIUSO, "Ticket non chiuso")
+
     def test_ricerca_articoli_kb(self):
 
         KBCache.objects.update_or_create(articleid=1, defaults={

@@ -543,14 +543,14 @@ class KayakoRESTService:
         return ticket_id, ticket_post_id, ticket_display_id
 
 
-    def createTicketPost(self, me, ticket_id, contents, file_name, file_content = None):
+    def createTicketPost(self, email, ticket_id, contents, file_name, file_content = None):
         """
         Questo metodo aggiunge un post con eventualmente un allegato, ad un ticket già presente
         :return:
         """
         params = {'ticketid': ticket_id,
                   'contents': contents,
-                  'userid': KayakoRESTService(me.email).get_userIdByEmail(me.email),
+                  'userid': KayakoRESTService(email).get_userIdByEmail(email),
                   'filename': file_name,
                   'isprivate': 0
                   }

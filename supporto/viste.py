@@ -252,7 +252,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
                 if contenuto_allegato:
                     contenuto_allegato_base64 = base64.encodebytes(contenuto_allegato)
 
-                KayakoRESTService(me.email).createTicketPost(me, ticket.id, contents, nome_allegato,
+                KayakoRESTService(me.email).createTicketPost(me.email, ticket.id, contents, nome_allegato,
                                                              contenuto_allegato_base64)
 
                 return redirect('/ticket/dettaglio/' + ticketdisplayID)
