@@ -1,5 +1,5 @@
 from anagrafica.permessi.applicazioni import PRESIDENTE, UFFICIO_SOCI, UFFICIO_SOCI_TEMPORANEO, UFFICIO_SOCI_UNITA
-from autenticazione.funzioni import pagina_privata
+from autenticazione.funzioni import pagina_privata, pagina_pubblica
 from base.errori import messaggio_generico
 from supporto.costanti import *
 from django.shortcuts import redirect
@@ -54,17 +54,21 @@ def supporto_nuova_richiesta(request, me=None):
                                                                                                department_id=id_dipartimento,
                                                                                                persona=persona)
             messaggio_errore_allegato = ''
-            try:
-                if len(request.FILES) != 0:
-                    nome_allegato = request.FILES['allegato'].name
-                    contenuto_allegato = request.FILES['allegato'].read()
+
+
+            for n in range(0, len(modulo.cleaned_data['allegati'])):
+
+                try:
+
+                    nome_allegato = modulo.cleaned_data['allegati'][n].name
+                    contenuto_allegato = modulo.cleaned_data['allegati'][n].read()
                     KayakoRESTService(me.email).addTicketAttachment(ticketID, ticketPostID, nome_allegato,
                                                                     base64.encodebytes(contenuto_allegato))
-            except Exception:
+                except Exception:
 
-                    messaggio_errore_allegato = ' \n <strong>Attenzione</strong>: non è stato possibile allegare il file. ' \
-                                                'Puoi provare a ripetere l''operazione dalla pagina ' \
-                                                'di dettaglio del ticket inserendo un nuovo commento con allegato.'
+                        messaggio_errore_allegato = ' \n <br><br><strong>Attenzione</strong>: non è stato possibile allegare uno o più file. ' \
+                                                    'Puoi provare a ripetere l''operazione dalla pagina ' \
+                                                    'di dettaglio del ticket inserendo un nuovo commento con allegato.'
 
             return messaggio_generico(request, me, titolo="Richiesta inoltrata",
                                       messaggio="Grazie per aver contattato il supporto. La tua richiesta con "
@@ -82,7 +86,7 @@ def supporto_nuova_richiesta(request, me=None):
         return supporto_errore_generico(request, me, e)
 
 
-@pagina_privata
+@pagina_pubblica
 def supporto_ricerca_kb(request, me=None):
     """
     Effettua la ricerca di articoli all'interno della knowledgebase e mostra una lista di articoli
@@ -97,31 +101,36 @@ def supporto_ricerca_kb(request, me=None):
     result_count = None
 
     try:
-        moduloRicercaInKnowledgeBase = ModuloRicercaInKnowledgeBase(request.POST or None)
+        if me:
+            moduloRicercaInKnowledgeBase = ModuloRicercaInKnowledgeBase(request.POST or None)
 
-        if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
-            keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
+            if moduloRicercaInKnowledgeBase and moduloRicercaInKnowledgeBase.is_valid():
+                keyword = moduloRicercaInKnowledgeBase.cleaned_data['cerca']
 
-            articoliRisultatoRicerca = KBCache.cerca_articoli(keyword)
+                articoliRisultatoRicerca = KBCache.cerca_articoli(keyword)
 
-            if (len(articoliRisultatoRicerca) == 0):
-                result_count = True
+                if (len(articoliRisultatoRicerca) == 0):
+                    result_count = True
+            else:
+
+                qs_articles = KBCache.objects.filter().order_by('-viewcount')[:3]
+                if (qs_articles):
+                    for kbcache in qs_articles:
+                        articoliInEvidenza.append(kbcache.to_KBArticle())
+
+            contesto = {
+                "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
+                "articoliRisultatoRicerca": articoliRisultatoRicerca,
+                "articoliInEvidenza": articoliInEvidenza,
+                "result_count": result_count,
+                "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
+            }
+
+            return 'supporto_home.html', contesto
+
         else:
 
-            qs_articles = KBCache.objects.filter().order_by('-viewcount')[:3]
-            if (qs_articles):
-                for kbcache in qs_articles:
-                    articoliInEvidenza.append(kbcache.to_KBArticle())
-
-        contesto = {
-            "moduloRicercaInKnowledgeBase": moduloRicercaInKnowledgeBase,
-            "articoliRisultatoRicerca": articoliRisultatoRicerca,
-            "articoliInEvidenza": articoliInEvidenza,
-            "result_count": result_count,
-            "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
-        }
-
-        return 'supporto_home.html', contesto
+            return 'supporto_pagina_pubblica.html'
 
     except Exception as e:
         return supporto_errore_generico(request, me, e)
@@ -241,19 +250,16 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
             if modulo and modulo.is_valid():
 
                 import base64
+
                 contents = modulo.cleaned_data['descrizione']
-                nome_allegato = None
-                contenuto_allegato = None
-                if len(request.FILES) != 0:
-                    nome_allegato = request.FILES['allegato'].name
-                    contenuto_allegato = request.FILES['allegato'].read()
+                #creo un post senza allegati
+                ticketPostID = KayakoRESTService(me.email).createTicketPost(me.email, ticket.id, contents, None, None)
 
-                contenuto_allegato_base64 = None
-                if contenuto_allegato:
-                    contenuto_allegato_base64 = base64.encodebytes(contenuto_allegato)
-
-                KayakoRESTService(me.email).createTicketPost(me.email, ticket.id, contents, nome_allegato,
-                                                             contenuto_allegato_base64)
+                for n in range(0, len(modulo.cleaned_data['allegati'])):
+                    nome_allegato = modulo.cleaned_data['allegati'][n].name
+                    contenuto_allegato = modulo.cleaned_data['allegati'][n].read()
+                    KayakoRESTService(me.email).addTicketAttachment(ticket.id, ticketPostID, nome_allegato,
+                                                                    base64.encodebytes(contenuto_allegato))
 
                 return redirect('/ticket/dettaglio/' + ticketdisplayID)
 
@@ -265,6 +271,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
             'ticket': ticket,
             'STATUS_TICKET': STATUS_TICKET,
             'TICKET_CHIUSO': str(TICKET_CHIUSO),
+            'TEXT_BREAK_STAFF': TEXT_BREAK_STAFF,
             'modulo': modulo,
             'sezioni': KayakoRESTService(me.email).listeTicket(me.email),
             'postList': postList,

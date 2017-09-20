@@ -40,3 +40,7 @@ TIPO_RICHIESTA_DIPARTIMENTO = {SEZ_INF: "137", #TEST API
                                SEZ_BLO: "137", #TEST API
                                SEZ_SVI: "137"} #TEST API
 
+#usato in supporto_modello_testo_ticket.html per determinare il testo
+#da mostrare solo allo staff e non all'utente
+TEXT_BREAK_STAFF = "<strong>Informazioni tecniche associate:</strong>"
+

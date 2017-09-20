@@ -4,7 +4,7 @@ from autocomplete_light import shortcuts as autocomplete_light
 
 from supporto.costanti import *
 from supporto.validators import valida_dimensione_file_2mb
-
+from multiupload.fields import MultiFileField
 
 class ModuloSceltaDipartimentoTicket(forms.Form):
     dipartimento = forms.ChoiceField(widget=forms.RadioSelect, initial=None,
@@ -22,15 +22,17 @@ class ModuloRichiestaTicket(forms.Form):
                                        "per aiutarci a smistarla rapidamente.")
     oggetto = forms.CharField(help_text="Una breve descrizione del problema.", min_length=3, max_length=150)
     descrizione = forms.CharField(widget=Textarea, min_length=3)
-    allegato = forms.FileField(required=False, validators=[valida_dimensione_file_2mb])
+    allegati = MultiFileField(min_num=0, max_num=5, max_file_size=1024 * 1024 * 3, required=False,
+                   help_text="Puoi selezionare fino a 5 allegati, per un totale di 3MB.")
 
-    field_order = ('tipo', 'oggetto', 'descrizione', 'allegato')
+    field_order = ('tipo', 'oggetto', 'descrizione', 'allegati')
 
 
 class ModuloPostTicket(forms.Form):
     descrizione = forms.CharField(
         widget=Textarea(attrs={'rows': 3, 'cols': 15, 'placeholder': 'Scrivi un commento...'}), min_length=3, label='')
-    allegato = forms.FileField(required=False, validators=[valida_dimensione_file_2mb])
+    allegati = MultiFileField(min_num=0, max_num=5, max_file_size=1024 * 1024 * 3, required=False,
+                   help_text="Puoi selezionare fino a 5 allegati, per un totale di 3MB.")
 
 
 class ModuloRichiestaTicketPersone(ModuloRichiestaTicket):

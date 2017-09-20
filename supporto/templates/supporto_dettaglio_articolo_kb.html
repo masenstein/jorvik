@@ -40,7 +40,7 @@
                     {% endif %}
                 </div>
             </div>
-            <button class="btn btn-info" style="float:right" onclick="return window.history.back()">
+            <button class="btn btn-info" style="float:right" onclick="(function goBack() { history.back(); return false;})();return false;">
                 <i class="fa fa-fw fa-arrow-left"></i>
                 Indietro
             </button>

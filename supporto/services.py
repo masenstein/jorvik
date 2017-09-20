@@ -367,6 +367,8 @@ class KayakoRESTService:
                 ticket_item.subject = ticket.find('./subject').text
                 ticket_list.append(ticket_item)
 
+        ticket_list.sort(key=lambda x: x.lastactivity, reverse=True)
+
         return ticket_list
 
     def get_ticketLightByDisplayID(self, ticket_display_id):
@@ -462,7 +464,8 @@ class KayakoRESTService:
                     int(post.find('./dateline').text)).strftime("%d/%m/%Y %H:%M:%S")
                 ticket_post_item.fullname = post.find('./fullname').text
                 ticket_post_item.hasattachments = post.find('./hasattachments').text
-                ticket_post_item.contents = post.find('./contents').text
+                # Elimino la parte del messaggio che deve essere visibile solo allo staff
+                ticket_post_item.contents = post.find('./contents').text.split(TEXT_BREAK_STAFF, 1)[0]
                 ticket_post_item_list.append(ticket_post_item)
 
             ticket_post_item_list.sort(key=lambda x: x.dateline, reverse=True)
@@ -494,8 +497,8 @@ class KayakoRESTService:
 
         attesa_risposta, in_lavorazione, chiusi = self.get_ticketCounts(KayakoRESTService(self.email).get_departments_ids(),[TICKET_APERTO,TICKET_IN_LAVORAZIONE,TICKET_CHIUSO,TICKET_ATTESA_RISPOSTA], self.get_userIdByEmail(email))
 
-        liste = [('In attesa di risposta', attesa_risposta, 'attesa_risposta'),
-                 ('In lavorazione', in_lavorazione, 'in_lavorazione'),
+        liste = [('In attesa di una tua risposta', attesa_risposta, 'attesa_risposta'),
+                 ('In carico allo staff', in_lavorazione, 'in_lavorazione'),
                  ('Chiusi', chiusi, 'chiusi')
                  ]
 
@@ -512,7 +515,8 @@ class KayakoRESTService:
         corpo={
             "testo": contents,
             "mittente": mittente,
-            "persona": persona
+            "persona": persona,
+            "text_break_staff": TEXT_BREAK_STAFF
         }
         ticket_contents = get_template("supporto_modello_testo_ticket.html").render(corpo)
 
@@ -561,10 +565,13 @@ class KayakoRESTService:
         self.params.update(params)
         url = KAYAKO_ENDPOINT + '/Tickets/TicketPost'
         r = Request(url, urlencode(self.params).encode())
-        urlopen(r).read().decode()
+        xml = urlopen(r).read().decode()
+        posts = ET.fromstring(xml)
+        ticket_post_id = posts.find('./post/id', None).text
+
         self._clean_user_cache()
 
-        return
+        return ticket_post_id
 
     def addTicketAttachment(self, ticket_id, ticket_post_id, file_name, file_content):
         """
