@@ -249,6 +249,7 @@ KAYAKO_API_KEY = APIS_CONF.get('kayako', 'api_key', fallback=os.environ.get("KAY
 KAYAKO_ENDPOINT = APIS_CONF.get('kayako', 'endpoint', fallback=os.environ.get("KAYAKO_ENDPOINT"))
 KAYAKO_CACHE_TTL = APIS_CONF.get('kayako', 'cache_ttl', fallback=os.environ.get("KAYAKO_CACHE_TTL"))
 KAYAKO_CACHE_ENABLED = APIS_CONF.get('kayako', 'cache_enabled', fallback=os.environ.get("KAYAKO_CACHE_ENABLED"))
+KAYAKO_DEPARTMENT_MAPPING = APIS_CONF.get('kayako', 'department_mapping', fallback=os.environ.get("KAYAKO_DEPARTMENT_MAPPING"))
 
 
 DESTINATARI_REPORT = ['sviluppo@cri.it', 'info@gaia.cri.it']

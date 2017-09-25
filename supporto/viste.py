@@ -45,6 +45,8 @@ def supporto_nuova_richiesta(request, me=None):
             descrizione = modulo.cleaned_data['descrizione']
             persona = modulo.cleaned_data.get('persona', None)
             id_dipartimento = TIPO_RICHIESTA_DIPARTIMENTO.get(modulo.cleaned_data['tipo'])
+            ticket_priority_id = TIPO_RICHIESTA_PRIORITA_STATO.get(modulo.cleaned_data['tipo'])[0]
+            ticket_status_id = TIPO_RICHIESTA_PRIORITA_STATO.get(modulo.cleaned_data['tipo'])[1]
 
             ticketID, ticketPostID, ticketDisplayID = KayakoRESTService(me.email).createTicket(mittente=me,
                                                                                                subject=oggetto,
@@ -52,7 +54,9 @@ def supporto_nuova_richiesta(request, me=None):
                                                                                                email=me.email,
                                                                                                contents=descrizione,
                                                                                                department_id=id_dipartimento,
-                                                                                               persona=persona)
+                                                                                               persona=persona,
+                                                                                               ticket_status_id=ticket_status_id,
+                                                                                               ticket_priority_id=ticket_priority_id)
             messaggio_errore_allegato = ''
 
 

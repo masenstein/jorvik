@@ -11,5 +11,6 @@
 secret_key =
 api_key =
 endpoint =
-cache_ttl =
-cache_enabled =
+cache_ttl = 120
+cache_enabled = 1
+department_mapping = {'INF':'49', 'REQ':'52', 'INC':'52', 'FEE':'64', 'BLO':'110', 'SVI':'105'}

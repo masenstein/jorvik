@@ -504,7 +504,7 @@ class KayakoRESTService:
 
         return liste
 
-    def createTicket(self, mittente, subject, fullname, email, contents, department_id, persona=None, ticket_status_id=TICKET_APERTO, ticket_priority_id=DEFAULT_TICKET_PRIORITY_ID, ticket_type_id=DEFAULT_TICKET_TYPE_ID, autouser_id=DEFAULT_AUTO_USER_ID):
+    def createTicket(self, mittente, subject, fullname, email, contents, department_id, persona=None, ticket_status_id=None, ticket_priority_id=None, ticket_type_id=DEFAULT_TICKET_TYPE_ID, autouser_id=DEFAULT_AUTO_USER_ID):
         """
         Questo metodo crea un ticket su kayako
         :return: la terna di valori ticketID, ticketPostID, ticketDisplayID
