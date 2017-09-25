@@ -367,7 +367,7 @@ class KayakoRESTService:
                 ticket_item.subject = ticket.find('./subject').text
                 ticket_list.append(ticket_item)
 
-        ticket_list.sort(key=lambda x: x.lastactivity, reverse=True)
+        ticket_list.sort(key=lambda x: datetime.datetime.strptime(x.lastactivity, "%d/%m/%Y %H:%M"), reverse=True)
 
         return ticket_list
 
@@ -446,6 +446,7 @@ class KayakoRESTService:
             status_id = ticket.find('./statusid').text
             ticket_item.id = ticket.attrib['id']
             ticket_item.displayid = ticket.find('./displayid').text
+            ticket_item.priorityid = ticket.find('./priorityid').text
             ticket_item.statusid = status_id
             ticket_item.lastactivity = datetime.datetime.fromtimestamp(
                 int(ticket.find('./lastactivity').text)).strftime("%d/%m/%Y %H:%M")
@@ -468,7 +469,7 @@ class KayakoRESTService:
                 ticket_post_item.contents = post.find('./contents').text.split(TEXT_BREAK_STAFF, 1)[0]
                 ticket_post_item_list.append(ticket_post_item)
 
-            ticket_post_item_list.sort(key=lambda x: x.dateline, reverse=True)
+            ticket_post_item_list.sort(key=lambda x: datetime.datetime.strptime(x.dateline, "%d/%m/%Y %H:%M:%S"), reverse=True)
             ticket_item.ticketPostItemList = ticket_post_item_list
             ticket_item.attachmentList = self.getTicketAttachments(ticket_item.id)
 

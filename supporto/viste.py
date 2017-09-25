@@ -77,7 +77,7 @@ def supporto_nuova_richiesta(request, me=None):
             return messaggio_generico(request, me, titolo="Richiesta inoltrata",
                                       messaggio="Grazie per aver contattato il supporto. La tua richiesta con "
                                                 "oggetto '%s' è stata correttamente inoltrata. Riceverai a breve "
-                                                "un messaggio di conferma del codice ticket <a href='/ticket/dettaglio/%s/'>'%s'</a> assegnato alla "
+                                                "un messaggio di conferma del codice ticket <a href='/ticket/dettaglio/%s/' id='ticketDisplayID'>'%s'</a> assegnato alla "
                                                 "tua richiesta. %s" % (oggetto, ticketDisplayID, ticketDisplayID, messaggio_errore_allegato,))
 
         contesto = {
