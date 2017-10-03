@@ -334,6 +334,7 @@ urlpatterns = [
     url(r'^ticket/$', supporto.viste.supporto_ricerca_kb),
     url(r'^ticket/nuova_richiesta/$', supporto.viste.supporto_nuova_richiesta),
     url(r'^ticket/ricerca_kb/$', supporto.viste.supporto_ricerca_kb),
+    url(r'^ticket/aperti/$', supporto.viste.supporto_aperti),
     url(r'^ticket/attesa_risposta/$', supporto.viste.supporto_attesa_risposta),
     url(r'^ticket/in_lavorazione/$', supporto.viste.supporto_in_lavorazione),
     url(r'^ticket/chiusi/$', supporto.viste.supporto_chiusi),

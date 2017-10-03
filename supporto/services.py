@@ -273,7 +273,7 @@ class KayakoRESTService:
         :return: il numero di ticket: in_attesa_di_risposta, in_lavorazione, chiusi
         """
         if user_id is None:
-            return 0, 0, 0
+            return 0, 0, 0, 0
 
         str_departments = ''
         for departmentId in departments_id_list:
@@ -283,6 +283,7 @@ class KayakoRESTService:
         for status_id in status_id_list:
             str_status = str_status + str(status_id) + ','
 
+        aperti = 0
         in_attesa_di_risposta = 0
         in_lavorazione = 0
         chiusi = 0
@@ -295,13 +296,15 @@ class KayakoRESTService:
             status_id = ticket.find('./statusid').text
             if status_id == str(TICKET_ATTESA_RISPOSTA):
                 in_attesa_di_risposta += 1
-            if status_id == str(TICKET_APERTO) or status_id == str(TICKET_IN_LAVORAZIONE):
+            if status_id == str(TICKET_APERTO):
+                 aperti += 1
+            if status_id == str(TICKET_IN_LAVORAZIONE):
                 in_lavorazione += 1
             if status_id == str(TICKET_CHIUSO):
                 chiusi += 1
         # todo generalizzare questo metodo riportando in output la lista delle occorrenze per ciascuno stato definito in input. Al momento per ticket in lavorazione si conteggiano anche quelli in stato Aperto
 
-        return in_attesa_di_risposta, in_lavorazione, chiusi
+        return aperti, in_attesa_di_risposta, in_lavorazione, chiusi
 
     def get_ticketBadgeCount(self, user_email):
         """
@@ -326,7 +329,7 @@ class KayakoRESTService:
             for ticket in tickets:
                 status_id = ticket.find('./statusid').text
                 if status_id == str(TICKET_ATTESA_RISPOSTA): in_attesa_di_risposta += 1
-            # todo generalizzare questo metodo riportando in output la lista delle occorrenze per ciascuno stato definito in input
+
         except Exception as e:
             pass
 
@@ -446,7 +449,6 @@ class KayakoRESTService:
             status_id = ticket.find('./statusid').text
             ticket_item.id = ticket.attrib['id']
             ticket_item.displayid = ticket.find('./displayid').text
-            ticket_item.priorityid = ticket.find('./priorityid').text
             ticket_item.statusid = status_id
             ticket_item.lastactivity = datetime.datetime.fromtimestamp(
                 int(ticket.find('./lastactivity').text)).strftime("%d/%m/%Y %H:%M")
@@ -496,9 +498,10 @@ class KayakoRESTService:
         :return: una lista di tuple (descrizione, numero, codifica)
         """
 
-        attesa_risposta, in_lavorazione, chiusi = self.get_ticketCounts(KayakoRESTService(self.email).get_departments_ids(),[TICKET_APERTO,TICKET_IN_LAVORAZIONE,TICKET_CHIUSO,TICKET_ATTESA_RISPOSTA], self.get_userIdByEmail(email))
+        aperti, attesa_risposta, in_lavorazione, chiusi = self.get_ticketCounts(KayakoRESTService(self.email).get_departments_ids(),[TICKET_APERTO,TICKET_IN_LAVORAZIONE,TICKET_CHIUSO,TICKET_ATTESA_RISPOSTA], self.get_userIdByEmail(email))
 
-        liste = [('In attesa di una tua risposta', attesa_risposta, 'attesa_risposta'),
+        liste = [('Aperti', aperti, 'aperti'),
+                 ('In attesa di una tua risposta', attesa_risposta, 'attesa_risposta'),
                  ('In carico allo staff', in_lavorazione, 'in_lavorazione'),
                  ('Chiusi', chiusi, 'chiusi')
                  ]

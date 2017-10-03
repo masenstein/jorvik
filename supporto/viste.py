@@ -182,15 +182,28 @@ def supporto_dettaglio_kb(request, me, articleID):
 
 
 @pagina_privata
-def supporto_attesa_risposta(request, me=None):
+def supporto_aperti(request, me=None):
     """
-    Visualizza la lista dei ticket in attesa di risposta
+    Visualizza la lista dei ticket aperti
     :param request:
     :param me:
     :return:
     """
     try:
-        return supporto_get_lista_ticket([TICKET_ATTESA_RISPOSTA], 'Ticket in attesa di risposta', me)
+        return supporto_get_lista_ticket([TICKET_APERTO], 'Ticket aperti', me)
+    except Exception as e:
+        return supporto_errore_generico(request, me, e)
+
+@pagina_privata
+def supporto_attesa_risposta(request, me=None):
+    """
+    Visualizza la lista dei ticket in attesa di risposta dell'utente
+    :param request:
+    :param me:
+    :return:
+    """
+    try:
+        return supporto_get_lista_ticket([TICKET_ATTESA_RISPOSTA], 'Ticket in attesa di una tua risposta', me)
     except Exception as e:
         return supporto_errore_generico(request, me, e)
 
@@ -198,13 +211,13 @@ def supporto_attesa_risposta(request, me=None):
 @pagina_privata
 def supporto_in_lavorazione(request, me=None):
     """
-    Visualizza la lista dei ticket aperti e in lavorazione
+    Visualizza la lista dei ticket in carico allo staff
     :param request:
     :param me:
     :return:
     """
     try:
-        return supporto_get_lista_ticket([TICKET_APERTO, TICKET_IN_LAVORAZIONE], 'Ticket in lavorazione', me)
+        return supporto_get_lista_ticket([TICKET_IN_LAVORAZIONE], 'Ticket in carico allo staff', me)
     except Exception as e:
         return supporto_errore_generico(request, me, e)
 
