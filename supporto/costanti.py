@@ -13,9 +13,9 @@ TICKET_PRIORITY_BASSA=7
 
 # MAPPA STATUS_TICKET: codice stato - decrizione stato
 STATUS_TICKET = {str(TICKET_APERTO): "Aperto",
-                 str(TICKET_IN_LAVORAZIONE): "In lavorazione",
+                 str(TICKET_IN_LAVORAZIONE): "In carico allo staff",
                  str(TICKET_CHIUSO): "Chiuso",
-                 str(TICKET_ATTESA_RISPOSTA): "In attesa di risposta"}
+                 str(TICKET_ATTESA_RISPOSTA): "In attesa di una tua risposta"}
 
 #ID SEZIONI FORM SUPPORTO
 
@@ -57,4 +57,6 @@ TIPO_RICHIESTA_PRIORITA_STATO = {SEZ_INF: (TICKET_PRIORITY_BASSA, TICKET_APERTO)
 # usato in supporto_modello_testo_ticket.html per determinare il testo
 # da mostrare solo allo staff e non all'utente
 TEXT_BREAK_STAFF = "<strong>Informazioni tecniche associate:</strong>"
+
+PAGINAZIONE_LISTE = 10
 

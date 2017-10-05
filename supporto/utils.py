@@ -23,31 +23,6 @@ def download_attachment(endpoint, parentID, attachmentID):
     return response
 
 
-def supporto_get_lista_ticket(statusIdList, titoloPagina, me=None):
-    """
-    Questo metodo recupera i ticket che si trovano in uno stato della lista statusIdList e li mostra in un template supporto_lista_ticket
-    :param statusIdList: lista di identificativi degli stati dei ticket da recuperare
-    :param titoloPagina: il title html della pagina che sarà mostrata
-    :return: il template html ed il contesto per la sua valorizzazione
-    """
-    from supporto.costanti import STATUS_TICKET
-    from supporto.services import KayakoRESTService
-
-    ticketList = KayakoRESTService(me.email).get_ticketListByStatus(KayakoRESTService(me.email).get_departments_ids(),
-                                                                    statusIdList,
-                                                                    KayakoRESTService(me.email).get_userIdByEmail(
-                                                                        me.email))
-
-    contesto = {
-        'STATUS_TICKET': STATUS_TICKET,
-        'sezioni': KayakoRESTService(me.email).listeTicket(me.email),
-        'lista_ticket': ticketList,
-        'titolo_pagina': titoloPagina
-    }
-
-    return 'supporto_lista_ticket.html', contesto
-
-
 def supporto_errore_generico(request, me, e):
     import logging
     logger = logging.getLogger('supporto')

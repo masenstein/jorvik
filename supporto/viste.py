@@ -59,7 +59,6 @@ def supporto_nuova_richiesta(request, me=None):
                                                                                                ticket_priority_id=ticket_priority_id)
             messaggio_errore_allegato = ''
 
-
             for n in range(0, len(modulo.cleaned_data['allegati'])):
 
                 try:
@@ -70,15 +69,16 @@ def supporto_nuova_richiesta(request, me=None):
                                                                     base64.encodebytes(contenuto_allegato))
                 except Exception:
 
-                        messaggio_errore_allegato = ' \n <br><br><strong>Attenzione</strong>: non è stato possibile allegare uno o più file. ' \
-                                                    'Puoi provare a ripetere l''operazione dalla pagina ' \
-                                                    'di dettaglio del ticket inserendo un nuovo commento con allegato.'
+                    messaggio_errore_allegato = ' \n <br><br><strong>Attenzione</strong>: non è stato possibile allegare uno o più file. ' \
+                                                'Puoi provare a ripetere l''operazione dalla pagina ' \
+                                                'di dettaglio del ticket inserendo un nuovo commento con allegato.'
 
             return messaggio_generico(request, me, titolo="Richiesta inoltrata",
                                       messaggio="Grazie per aver contattato il supporto. La tua richiesta con "
                                                 "oggetto '%s' è stata correttamente inoltrata. Riceverai a breve "
                                                 "un messaggio di conferma del codice ticket <a href='/ticket/dettaglio/%s/' id='ticketDisplayID'>'%s'</a> assegnato alla "
-                                                "tua richiesta. %s" % (oggetto, ticketDisplayID, ticketDisplayID, messaggio_errore_allegato,))
+                                                "tua richiesta. %s" % (
+                                                oggetto, ticketDisplayID, ticketDisplayID, messaggio_errore_allegato,))
 
         contesto = {
             "modulo": modulo,
@@ -141,6 +141,81 @@ def supporto_ricerca_kb(request, me=None):
 
 
 @pagina_privata
+def supporto_ricerca_ticket(request, me=None):
+    """
+    Effettua la ricerca di ticket all'interno di kayako e mostra una lista paginata di ticket
+    :param request:
+    :param me:
+    :return:
+    """
+    from supporto.costanti import STATUS_TICKET
+
+    lista_ticket = []
+    try:
+        if me:
+            ticket_display_id = request.GET.get('ticket_display_id', '')
+            dipartimento_selezionato = request.GET.get('dipartimento', '-1')
+            stato_selezionato = request.GET.get('stato', '-1')
+            count = PAGINAZIONE_LISTE
+            start = int(request.GET.get('start', '0'))
+
+            if ticket_display_id:
+
+                ticket = KayakoRESTService(me.email).get_ticketByDisplayID(ticket_display_id)
+                # verifico se l'utente è proprietario del ticket
+                if ticket.email == me.email:
+                    lista_ticket.append(ticket)
+            else:
+
+                if dipartimento_selezionato == '-1':
+                    dipartimento_selezionato_list = KayakoRESTService(me.email).get_departments_ids()
+                else:
+                    dipartimento_selezionato_list = [dipartimento_selezionato]
+
+                if stato_selezionato == '-1':
+                    stato_selezionato_list = [TICKET_APERTO, TICKET_IN_LAVORAZIONE, TICKET_CHIUSO,
+                                              TICKET_ATTESA_RISPOSTA]
+                else:
+                    stato_selezionato_list = [stato_selezionato]
+
+                lista_ticket = KayakoRESTService(me.email).get_ticketList(dipartimento_selezionato_list,
+                                                                          stato_selezionato_list,
+                                                                          KayakoRESTService(me.email).get_userIdByEmail(
+                                                                              me.email), count + 1, start)
+
+            pagina_successiva = None
+            if (len(lista_ticket) == (count + 1)):
+                pagina_successiva = start + count
+                lista_ticket = lista_ticket[0:-1]
+
+            pagina_precedente = None
+            if (start != 0):
+                pagina_precedente = start - count
+
+            pagina_corrente = int(start / count) + 1
+
+        contesto = {
+            "lista_ticket": lista_ticket,
+            "dipartimento": KayakoRESTService(me.email).get_departments(TIPO_RICHIESTA_DIPARTIMENTO.values()),
+            "dipartimento_selezionato": dipartimento_selezionato,
+            "stato_selezionato": stato_selezionato,
+            "ticket_display_id": ticket_display_id,
+            "sezioni": KayakoRESTService(me.email).listeTicket(me.email),
+            "dipartimento_mapping": dict(
+                KayakoRESTService(me.email).get_departments(TIPO_RICHIESTA_DIPARTIMENTO.values())),
+            "STATUS_TICKET": STATUS_TICKET,
+            "pagina_successiva": pagina_successiva,
+            "pagina_precedente": pagina_precedente,
+            "pagina_corrente": pagina_corrente,
+        }
+
+    except Exception as e:
+        return supporto_errore_generico(request, me, e)
+
+    return 'supporto_ricerca_ticket.html', contesto
+
+
+@pagina_privata
 def supporto_dettaglio_kb(request, me, articleID):
     from supporto.models import KBCache
     """
@@ -182,61 +257,6 @@ def supporto_dettaglio_kb(request, me, articleID):
 
 
 @pagina_privata
-def supporto_aperti(request, me=None):
-    """
-    Visualizza la lista dei ticket aperti
-    :param request:
-    :param me:
-    :return:
-    """
-    try:
-        return supporto_get_lista_ticket([TICKET_APERTO], 'Ticket aperti', me)
-    except Exception as e:
-        return supporto_errore_generico(request, me, e)
-
-@pagina_privata
-def supporto_attesa_risposta(request, me=None):
-    """
-    Visualizza la lista dei ticket in attesa di risposta dell'utente
-    :param request:
-    :param me:
-    :return:
-    """
-    try:
-        return supporto_get_lista_ticket([TICKET_ATTESA_RISPOSTA], 'Ticket in attesa di una tua risposta', me)
-    except Exception as e:
-        return supporto_errore_generico(request, me, e)
-
-
-@pagina_privata
-def supporto_in_lavorazione(request, me=None):
-    """
-    Visualizza la lista dei ticket in carico allo staff
-    :param request:
-    :param me:
-    :return:
-    """
-    try:
-        return supporto_get_lista_ticket([TICKET_IN_LAVORAZIONE], 'Ticket in carico allo staff', me)
-    except Exception as e:
-        return supporto_errore_generico(request, me, e)
-
-
-@pagina_privata
-def supporto_chiusi(request, me=None):
-    """
-    Visualizza la lista dei ticket chiusi
-    :param request:
-    :param me:
-    :return:
-    """
-    try:
-        return supporto_get_lista_ticket([TICKET_CHIUSO], 'Ticket chiusi', me)
-    except Exception as e:
-        return supporto_errore_generico(request, me, e)
-
-
-@pagina_privata
 def supporto_dettaglio_ticket(request, me, ticketdisplayID):
     """
     Visualizza la pagina di dettaglio di un ticket con il pulsante "Chiudi  ticket" (se il ticket non e' gia' chiuso)
@@ -246,7 +266,6 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
     :param ticketdisplayID: display ID del ticket
     :return:
     """
-    from base.errori import permessi
     from supporto.costanti import TICKET_CHIUSO, STATUS_TICKET
     from supporto.forms import ModuloPostTicket
 
@@ -255,7 +274,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
         ticket = KayakoRESTService(me.email).get_ticketByDisplayID(ticketdisplayID)
         # verifico se l'utente è proprietario del ticket
         if ticket.email != me.email:
-            return permessi(request, me)
+            raise Exception('Accesso al ticket %s non autorizzato' % ticketdisplayID)
 
         postList = ticket.ticketPostItemList
         attachmentList = ticket.attachmentList
@@ -269,7 +288,7 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
                 import base64
 
                 contents = modulo.cleaned_data['descrizione']
-                #creo un post senza allegati
+                # creo un post senza allegati
                 ticketPostID = KayakoRESTService(me.email).createTicketPost(me.email, ticket.id, contents, None, None)
 
                 for n in range(0, len(modulo.cleaned_data['allegati'])):
@@ -288,6 +307,8 @@ def supporto_dettaglio_ticket(request, me, ticketdisplayID):
             'ticket': ticket,
             'STATUS_TICKET': STATUS_TICKET,
             'TICKET_CHIUSO': str(TICKET_CHIUSO),
+            "dipartimento_mapping": dict(
+                KayakoRESTService(me.email).get_departments(TIPO_RICHIESTA_DIPARTIMENTO.values())),
             'TEXT_BREAK_STAFF': TEXT_BREAK_STAFF,
             'modulo': modulo,
             'sezioni': KayakoRESTService(me.email).listeTicket(me.email),

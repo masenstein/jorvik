@@ -18,49 +18,50 @@
             <div class="panel panel-info">
 
                 <div class="panel-heading">
-                    <i class="fa fa-fw fa-user"></i> Dettaglio ticket
+                    <i class="fa fa-fw fa-user"></i> Dettaglio ticket  <strong>{{ ticket.displayid }}</strong>
                 </div>
 
                 <div class="panel-body">
-
-                    <table class="table table-responsive table-striped">
+                    <table class="table table-responsive table-striped" style="margin-bottom: 0px;">
                         <tr>
-                            <td>ID Ticket</td>
-                            <td class="grassetto">{{ ticket.displayid }}</td>
-                        </tr>
-                        <tr>
-                            <td>Oggetto</td>
-                            <td class="grassetto">{{ ticket.subject | slice:"0:50" }}</td>
+                            <td colspan="4">Oggetto:  <strong>{{ ticket.subject | slice:"0:100" }}</strong></td>
                         </tr>
                         <tr>
                             <td>Ultimo aggiornamento</td>
                             <td class="grassetto">{{ ticket.lastactivity }}</td>
-                        </tr>
-                        <tr>
                             <td>Ultimo che ha risposto</td>
                             <td class="grassetto">{{ ticket.lastreplier }}</td>
+
                         </tr>
                         <tr>
+                            <td>Dipartimento</td>
+                            {% if ticket.departmentid in  dipartimento_mapping.keys %}
+                                <td class="grassetto">{{dipartimento_mapping|hash:ticket.departmentid }}</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
                             <td>Stato</td>
                             <td class="grassetto">{{STATUS_TICKET|hash:ticket.statusid }}</td>
+
                         </tr>
                         {% if ticket.statusid != TICKET_CHIUSO %}
-                        <tr>
-                            <td colspan="2">
-                                <a href="/ticket/chiudi_ticket/{{ ticket.displayid }}/"  class="btn btn-primary" style="float:right"
-                                   data-conferma="Vuoi davvero chiudere il ticket {{ ticket.displayid }}?"
-                                   data-caricamento="Attendi...">
-                                    <i class="fa fa-check"></i>
-                                    Chiudi ticket
-                                </a>
-                            </td>
-                        </tr>
+                            <tr>
+                                <td colspan="4">
+                                    <a href="/ticket/chiudi_ticket/{{ ticket.displayid }}/"  class="btn btn-primary" style="float:right"
+                                       data-conferma="Vuoi davvero chiudere il ticket {{ ticket.displayid }}?"
+                                       data-caricamento="Attendi...">
+                                        <i class="fa fa-check"></i>
+                                        Chiudi ticket
+                                    </a>
+                                </td>
+                            </tr>
                         {% endif %}
                     </table>
 
                 </div>
 
             </div>
+
             <h3>
                 <i class="fa fa-fw fa-comments-o"></i>
                 Commenti

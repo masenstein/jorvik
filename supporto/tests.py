@@ -1,8 +1,5 @@
 import datetime
-from unittest import skipIf
-
 from django.test import TestCase
-
 from anagrafica.models import Delega
 from anagrafica.permessi.applicazioni import UFFICIO_SOCI, UFFICIO_SOCI_UNITA
 from autenticazione.utils_test import TestFunzionale
@@ -12,7 +9,6 @@ from supporto.costanti import *
 from supporto.models import KBCache
 from supporto.services import KayakoRESTService
 
-@skipIf(True,'Nessun test non funzionale eseguito per la sezione supporto')
 class TestSupporto(TestCase):
 
     def test_create_ticket(self):
@@ -116,10 +112,9 @@ class TestSupporto(TestCase):
 
 
 
-@skipIf(False,'Nessun test funzionale eseguito per la sezione supporto')
 class TestFunzionaleSupporto(TestFunzionale):
 
-    def test_crea_ticket(self):
+    def test_crea_ticket_con_commento_e_chiudi(self):
         import time
 
         presidente = crea_persona()
@@ -184,7 +179,7 @@ class TestFunzionaleSupporto(TestFunzionale):
         self.assertTrue(sessione_normale.is_text_present('Richiesta inoltrata'))
         # recupero display ID del ticket creato
         sessione_normale.find_by_xpath('//a[@id="ticketDisplayID"]').click()
-        self.assertTrue("Oggettoditest" in sessione_normale.find_by_xpath('//td[.="Oggetto"]/following-sibling::td[1]').value)
+        self.assertTrue("Oggettoditest" in sessione_normale.find_by_xpath('//td[.="Oggetto:  Oggettoditest"]').value)
         self.assertEqual(sessione_normale.find_by_xpath('//td[.="Stato"]/following-sibling::td[1]').value, "Aperto")        
         
 

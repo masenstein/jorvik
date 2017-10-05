@@ -237,6 +237,7 @@ def menu(request):
         "supporto": (
             ("Supporto", (
                 ("Cerca negli articoli", "fa-search", "/ticket/"),
+                ("Cerca nei ticket", "fa-search", "/ticket/ricerca-ticket/"),
             )),
         ),
     }

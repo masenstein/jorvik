@@ -6,6 +6,7 @@
     <th>ID Ticket</th>
     <th>Oggetto</th>
     <th>Ultimo aggiornamento</th>
+    <th>Dipartimento</th>
     <th>Stato</th>
     </thead>
 
@@ -15,6 +16,11 @@
             <td><a href="/ticket/dettaglio/{{ ticket.displayid }}">{{ ticket.displayid }}</a></td>
             <td>{{ ticket.subject | slice:"0:50" }}</td>
             <td>{{ ticket.lastactivity }}</td>
+            {% if ticket.departmentid in  dipartimento_mapping.keys %}
+                <td>{{ dipartimento_mapping|hash:ticket.departmentid }}</td>
+            {% else %}
+                <td></td>
+            {% endif %}
             <td>{{ STATUS_TICKET|hash:ticket.statusid }}</td>
         </tr>
 
@@ -28,3 +34,21 @@
     {% endfor %}
 
 </table>
+
+{% if lista_ticket %}
+    <div class="allinea-centro">
+        <div class="pagination">
+                <span class="page-links">
+                    {% if pagina_corrente > 1 %}
+                        <a href="?start={{ pagina_precedente }}&dipartimento={{ dipartimento_selezionato }}&stato={{ stato_selezionato }}">Precedente</a>
+                    {% endif %}
+                    <span class="page-current padding-15">
+                        Pagina {{ pagina_corrente }}
+                    </span>
+                    {% if pagina_successiva %}
+                        <a href="?start={{ pagina_successiva }}&dipartimento={{ dipartimento_selezionato }}&stato={{ stato_selezionato }}">Successiva</a>
+                    {% endif %}
+                </span>
+        </div>
+    </div>
+{% endif %}

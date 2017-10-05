@@ -33,10 +33,10 @@
 
                     <li class="dropdown-header grassetto piu-grande">Ticket</li>
 
-                    {% for sez_nome, sez_numero, sez_link in sezioni %}
+                    {% for sez_nome, sez_numero, sez_stato in sezioni %}
 
-                        <li role="presentation" {% if sez_link in request.path %}class="active"{% endif %}>
-                            <a href="/ticket/{{ sez_link|urlencode }}/">
+                        <li role="presentation" {% if sez_stato in request.path %}class="active"{% endif %}>
+                            <a href="/ticket/ricerca-ticket/?stato={{ sez_stato }}" >
                                 {{ sez_nome }}
                                 <span class="badge pull-right">
                             {{ sez_numero }}

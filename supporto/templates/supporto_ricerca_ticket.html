@@ -1,0 +1,66 @@
+{% extends "anagrafica_utente_vuota.html" %}
+
+{% load bootstrap3 %}
+{% load mptt_tags %}
+
+{% block pagina_titolo %}{{ titolo_pagina }}{% endblock %}
+
+{% block menu_laterale %}
+    {% include "includes/menu_supporto.html" %}
+{% endblock %}
+
+{% block app_contenuto %}
+
+    <div class="panel panel-info">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <i class="fa fa-fw fa-search"></i>
+                Filtra i Ticket
+            </h3>
+        </div>
+        <div class="panel-body">
+            <form method='GET'>
+                {% csrf_token %}
+                <div class="row">
+                        <span class="col-md-3">
+                            <input type="text" name="ticket_display_id" id="ticket-display-id"
+                                   value="{{ ticket_display_id }}" class="form-control"
+                                   placeholder="ID del Ticket" />
+                        </span>
+                        <span class="col-md-3">
+                                <select name="dipartimento" value="" class="form-control">
+                                    <option value="-1" {% if dipartimento_selezionato == -1 %} selected="true" {% endif %} >Tutti i dipartimenti</option>
+                                    {% for d_value,d_descr in dipartimento %}
+                                        <option value="{{d_value}}" {% if dipartimento_selezionato == d_value %} selected="true" {% endif %}>{{d_descr}}</option>
+                                    {% endfor %}
+                                </select>
+                            </span>
+                        <span class="col-md-3">
+                                <select name="stato" value="" class="form-control">
+                                    <option value="-1" {% if stato_selezionato == -1 %} selected="true" {% endif %} >Tutti gli stati</option>
+                                    {% for d_value,d_descr in STATUS_TICKET.items %}
+                                        <option value="{{d_value}}" {% if stato_selezionato == d_value %} selected="true" {% endif %}>{{d_descr}}</option>
+                                    {% endfor %}
+                                </select>
+                            </span>
+                        <span class="col-md-3 btn-group">
+                                <button type="submit" class="btn btn-info">
+                                    <i class="fa fa-fw fa-check"></i> Filtra
+                                </button>
+                                <a href="{% url 'lista_ticket' %}" class="btn btn-default">
+                                    <i class="fa fa-fw fa-times"></i> Annulla
+                                </a>
+                        </span>
+
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+
+    {% include "includes/tabella_lista_ticket.html" %}
+
+
+
+{% endblock %}

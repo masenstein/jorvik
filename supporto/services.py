@@ -78,9 +78,10 @@ class KayakoRESTService:
 
         return
 
-    def get_departments(self):
+    def get_departments(self, department_id_list=None):
         """
-        Questo metodo recupera l'elenco completo dei dipartimenti configurati su kayako.
+        Questo metodo recupera l'elenco dei dipartimenti nella lista passata come parametro,
+        se la lista è vuota recupera l'elenco completo dei dipartimenti configurati su kayako.
         :return: una lista di tuple: (id, title)
         """
         dept_list = []
@@ -91,7 +92,9 @@ class KayakoRESTService:
             for department in departments:
                 id = department.find('./id').text
                 title = department.find('./title').text
-                dept_list.append((id, title))
+                if(len(department_id_list) == 0 or (id in department_id_list) ):
+                  dept_list.append((id, title))
+
         except Exception as e:
             pass
 
@@ -335,7 +338,7 @@ class KayakoRESTService:
 
         return in_attesa_di_risposta
 
-    def get_ticketListByStatus(self, departments_id_list, status_id_list, user_id):
+    def get_ticketList(self, departments_id_list, status_id_list, user_id, count=-1, start=-1,sort_field='lastactivity', sort_order='DESC'):
         """
         Questo metodo recupera la lista dei ticket di un utente, che appartengono a un elenco di dipartimenti con degli stati specificati
         :return: una lista di ticket
@@ -352,7 +355,7 @@ class KayakoRESTService:
             str_status = str_status + str(status_id) + ','
 
         url = KAYAKO_ENDPOINT + '/Tickets/Ticket/ListAll/' + str_departments + '/' + str_status + '/-1/' + str(
-            user_id) + '/-1/-1/-1/-1'
+            user_id) + '/' + str(count) + '/' + str(start) +'/'+ sort_field +'/'+sort_order+''
 
         ticket_list = []
 
@@ -361,18 +364,25 @@ class KayakoRESTService:
             ticket_item = Ticket()
             status_id = ticket.find('./statusid').text
 
-            if int(status_id) in status_id_list:
-                ticket_item.id = ticket.attrib['id']
-                ticket_item.displayid = ticket.find('./displayid').text
-                ticket_item.statusid = status_id
-                ticket_item.lastactivity = datetime.datetime.fromtimestamp(
-                    int(ticket.find('./lastactivity').text)).strftime("%d/%m/%Y %H:%M")
-                ticket_item.subject = ticket.find('./subject').text
-                ticket_list.append(ticket_item)
 
-        ticket_list.sort(key=lambda x: datetime.datetime.strptime(x.lastactivity, "%d/%m/%Y %H:%M"), reverse=True)
+            ticket_item.id = ticket.attrib['id']
+            ticket_item.displayid = ticket.find('./displayid').text
+            ticket_item.statusid = status_id
+            ticket_item.lastactivity = datetime.datetime.fromtimestamp(
+                int(ticket.find('./lastactivity').text)).strftime("%d/%m/%Y %H:%M")
+            ticket_item.subject = ticket.find('./subject').text
+            ticket_item.departmentid = ticket.find('./departmentid').text
+            ticket_list.append(ticket_item)
 
         return ticket_list
+
+
+    def get_ticketListByStatus(self, departments_id_list, status_id_list, user_id):
+        """
+        Questo metodo recupera la lista dei ticket di un utente, che appartengono a un elenco di dipartimenti con degli stati specificati
+        :return: una lista di ticket
+        """
+        return self.get_ticketList(departments_id_list, status_id_list, user_id,-1,-1,'lastactivity','DESC')
 
     def get_ticketLightByDisplayID(self, ticket_display_id):
         """
@@ -455,6 +465,7 @@ class KayakoRESTService:
             ticket_item.subject = ticket.find('./subject').text
             ticket_item.lastreplier = ticket.find('./lastreplier').text
             ticket_item.email = ticket.find('./email').text
+            ticket_item.departmentid = ticket.find('./departmentid').text
 
             ticket_post_item_list = []
 
@@ -500,10 +511,10 @@ class KayakoRESTService:
 
         aperti, attesa_risposta, in_lavorazione, chiusi = self.get_ticketCounts(KayakoRESTService(self.email).get_departments_ids(),[TICKET_APERTO,TICKET_IN_LAVORAZIONE,TICKET_CHIUSO,TICKET_ATTESA_RISPOSTA], self.get_userIdByEmail(email))
 
-        liste = [('Aperti', aperti, 'aperti'),
-                 ('In attesa di una tua risposta', attesa_risposta, 'attesa_risposta'),
-                 ('In carico allo staff', in_lavorazione, 'in_lavorazione'),
-                 ('Chiusi', chiusi, 'chiusi')
+        liste = [(STATUS_TICKET[str(TICKET_APERTO)], aperti, TICKET_APERTO),
+                 (STATUS_TICKET[str(TICKET_ATTESA_RISPOSTA)], attesa_risposta, TICKET_ATTESA_RISPOSTA),
+                 (STATUS_TICKET[str(TICKET_IN_LAVORAZIONE)], in_lavorazione, TICKET_IN_LAVORAZIONE),
+                 (STATUS_TICKET[str(TICKET_CHIUSO)], chiusi, TICKET_CHIUSO)
                  ]
 
         return liste
