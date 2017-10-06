@@ -111,7 +111,7 @@ class KayakoRESTService:
         departments = self._getresponse(url, self.params)
         for department in departments:
             id = department.find('./id').text
-            dept_list.append(int(id))
+            dept_list.append(id)
 
         return dept_list
 
@@ -278,13 +278,8 @@ class KayakoRESTService:
         if user_id is None:
             return 0, 0, 0, 0
 
-        str_departments = ''
-        for departmentId in departments_id_list:
-            str_departments = str_departments + str(departmentId) + ','
-
-        str_status = ''
-        for status_id in status_id_list:
-            str_status = str_status + str(status_id) + ','
+        str_departments = ','.join(departments_id_list)
+        str_status = ','.join(status_id_list)
 
         aperti = 0
         in_attesa_di_risposta = 0
@@ -321,9 +316,7 @@ class KayakoRESTService:
                 return 0
 
             departments_id_list = KayakoRESTService(self.email).get_departments_ids()
-            str_departments = ''
-            for departmentId in departments_id_list:
-                str_departments = str_departments + str(departmentId) + ','
+            str_departments = ','.join(departments_id_list)
 
             url = KAYAKO_ENDPOINT + '/Tickets/Ticket/ListAll/' + str_departments + '/' + str(TICKET_ATTESA_RISPOSTA)\
                   + '/-1/' + str(user_id) + '/-1/-1/-1/-1'
@@ -346,13 +339,8 @@ class KayakoRESTService:
         if user_id is None:
             return None
 
-        str_departments = ''
-        for departmentId in departments_id_list:
-            str_departments = str_departments + str(departmentId) + ','
-
-        str_status = ''
-        for status_id in status_id_list:
-            str_status = str_status + str(status_id) + ','
+        str_departments = ','.join(departments_id_list)
+        str_status = ','.join(status_id_list)
 
         url = KAYAKO_ENDPOINT + '/Tickets/Ticket/ListAll/' + str_departments + '/' + str_status + '/-1/' + str(
             user_id) + '/' + str(count) + '/' + str(start) +'/'+ sort_field +'/'+sort_order+''
@@ -509,7 +497,7 @@ class KayakoRESTService:
         :return: una lista di tuple (descrizione, numero, codifica)
         """
 
-        aperti, attesa_risposta, in_lavorazione, chiusi = self.get_ticketCounts(KayakoRESTService(self.email).get_departments_ids(),[TICKET_APERTO,TICKET_IN_LAVORAZIONE,TICKET_CHIUSO,TICKET_ATTESA_RISPOSTA], self.get_userIdByEmail(email))
+        aperti, attesa_risposta, in_lavorazione, chiusi = self.get_ticketCounts(KayakoRESTService(self.email).get_departments_ids(),[str(TICKET_APERTO),str(TICKET_IN_LAVORAZIONE),str(TICKET_CHIUSO),str(TICKET_ATTESA_RISPOSTA)], self.get_userIdByEmail(email))
 
         liste = [(STATUS_TICKET[str(TICKET_APERTO)], aperti, TICKET_APERTO),
                  (STATUS_TICKET[str(TICKET_ATTESA_RISPOSTA)], attesa_risposta, TICKET_ATTESA_RISPOSTA),

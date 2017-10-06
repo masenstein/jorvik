@@ -170,13 +170,13 @@ def supporto_ricerca_ticket(request, me=None):
                 if dipartimento_selezionato == '-1':
                     dipartimento_selezionato_list = KayakoRESTService(me.email).get_departments_ids()
                 else:
-                    dipartimento_selezionato_list = [dipartimento_selezionato]
+                    dipartimento_selezionato_list = [str(dipartimento_selezionato)]
 
                 if stato_selezionato == '-1':
-                    stato_selezionato_list = [TICKET_APERTO, TICKET_IN_LAVORAZIONE, TICKET_CHIUSO,
-                                              TICKET_ATTESA_RISPOSTA]
+                    stato_selezionato_list = [str(TICKET_APERTO), str(TICKET_IN_LAVORAZIONE), str(TICKET_CHIUSO),
+                                              str(TICKET_ATTESA_RISPOSTA)]
                 else:
-                    stato_selezionato_list = [stato_selezionato]
+                    stato_selezionato_list = [str(stato_selezionato)]
 
                 lista_ticket = KayakoRESTService(me.email).get_ticketList(dipartimento_selezionato_list,
                                                                           stato_selezionato_list,
@@ -192,7 +192,7 @@ def supporto_ricerca_ticket(request, me=None):
             if (start != 0):
                 pagina_precedente = start - count
 
-            pagina_corrente = int(start / count) + 1
+            pagina_corrente = (start//count) + 1
 
         contesto = {
             "lista_ticket": lista_ticket,
