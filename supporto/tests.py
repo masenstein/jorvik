@@ -12,16 +12,21 @@ from supporto.services import KayakoRESTService
 class TestSupporto(TestCase):
 
     def test_create_ticket(self):
+
+        persona = crea_persona()
+
         email = email_fittizzia()
 
         #creo il ticket
-        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService(email).createTicket(mittente="Nome Cognome",
+        ticketID, ticketPostID, ticketDisplayID = KayakoRESTService(email).createTicket(mittente=persona,
                                                                                            subject="Ticket test",
                                                                                            fullname="Nome Cognome",
                                                                                            email=email,
                                                                                            contents="Descrizione test",
                                                                                            department_id="137",
-                                                                                           persona=None)
+                                                                                           persona=None,
+                                                                                           ticket_priority_id=TICKET_PRIORITY_BASSA,
+                                                                                           ticket_status_id=TICKET_APERTO)
 
         self.assertTrue(int(ticketID) > 0, "Ticket non creato su Kayako")
 
@@ -57,26 +62,32 @@ class TestSupporto(TestCase):
 
         liste = KayakoRESTService(email).listeTicket(email)
 
-        self.assertTrue(3 == len(liste), 'Non sono presenti tutte le liste di ticket: attesa_risposta, in_lavorazione, chiusi')
+        self.assertTrue(4 == len(liste), 'Non sono presenti tutte le liste di ticket: attesa_risposta, in_lavorazione, chiusi')
+
+        aperti = KayakoRESTService(email).get_ticketListByStatus(KayakoRESTService(email).get_departments_ids(),
+                                                                          [str(TICKET_APERTO)],
+                                                                          KayakoRESTService(email).get_userIdByEmail(
+                                                                              email))
 
         attesa_risposta = KayakoRESTService(email).get_ticketListByStatus(KayakoRESTService(email).get_departments_ids(),
-                                                                          [TICKET_ATTESA_RISPOSTA],
+                                                                          [str(TICKET_ATTESA_RISPOSTA)],
                                                                           KayakoRESTService(email).get_userIdByEmail(
                                                                               email))
 
         in_lavorazione = KayakoRESTService(email).get_ticketListByStatus(KayakoRESTService(email).get_departments_ids(),
-                                                                         [TICKET_IN_LAVORAZIONE, TICKET_APERTO],
+                                                                         [str(TICKET_IN_LAVORAZIONE)],
                                                                          KayakoRESTService(email).get_userIdByEmail(
                                                                              email))
 
         chiusi = KayakoRESTService(email).get_ticketListByStatus(KayakoRESTService(email).get_departments_ids(),
-                                                                 [TICKET_CHIUSO],
+                                                                 [str(TICKET_CHIUSO)],
                                                                  KayakoRESTService(email).get_userIdByEmail(
                                                                      email))
 
-        self.assertTrue(len(attesa_risposta) == liste[0][1], 'Il numero di ticket in attesa_risposta non coincide con i contatori dei ticket')
-        self.assertTrue(len(in_lavorazione) == liste[1][1], 'Il numero di ticket in in_lavorazione non coincide con i contatori dei ticket')
-        self.assertTrue(len(chiusi) == liste[2][1], 'Il numero di ticket in chiusi non coincide con i contatori dei ticket')
+        self.assertTrue(len(aperti) == liste[0][1], 'Il numero di ticket in aperti non coincide con i contatori dei ticket')
+        self.assertTrue(len(attesa_risposta) == liste[1][1], 'Il numero di ticket in attesa_risposta non coincide con i contatori dei ticket')
+        self.assertTrue(len(in_lavorazione) == liste[2][1], 'Il numero di ticket in in_lavorazione non coincide con i contatori dei ticket')
+        self.assertTrue(len(chiusi) == liste[3][1], 'Il numero di ticket in chiusi non coincide con i contatori dei ticket')
 
 
         ticket_item_2 = KayakoRESTService(email).get_ticketByDisplayID(ticketDisplayID)
